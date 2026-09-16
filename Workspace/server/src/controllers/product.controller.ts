@@ -17,10 +17,29 @@ export const getProductsHandler = async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const searchValue = req.query.searchValue as string | undefined;
 
+    const destination = req.query.destination as string | undefined;
+    const category = req.query.category as string | undefined;
+    const minPrice = req.query.minPrice
+      ? parseFloat(req.query.minPrice as string)
+      : undefined;
+    const maxPrice = req.query.maxPrice
+      ? parseFloat(req.query.maxPrice as string)
+      : undefined;
+    const status = req.query.status as string | undefined;
+    const includeExpired = req.query.includeExpired === "true";
+
     const { products, totalCount } = await productData.getProducts(
       page,
       limit,
       searchValue,
+      {
+        destination,
+        category,
+        minPrice,
+        maxPrice,
+        status,
+        includeExpired,
+      },
     );
 
     res.status(200).json({

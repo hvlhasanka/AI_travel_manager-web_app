@@ -20,21 +20,61 @@ export const createProduct = async (data: CreateProductInput) => {
   });
 };
 
+export interface ProductFilters {
+  destination?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  status?: string;
+  includeExpired?: boolean;
+}
+
 export const getProducts = async (
   page: number = 1,
   limit: number = 10,
   searchValue?: string,
+  filters?: ProductFilters,
 ) => {
   const skip = (page - 1) * limit;
 
-  const where = searchValue
-    ? {
-        productName: {
-          contains: searchValue,
-          mode: "insensitive" as const,
-        },
-      }
-    : {};
+  const where: any = {};
+
+  if (searchValue) {
+    where.productName = {
+      contains: searchValue,
+      mode: "insensitive",
+    };
+  }
+
+  if (filters?.destination) {
+    where.destination = {
+      contains: filters.destination,
+      mode: "insensitive",
+    };
+  }
+
+  if (filters?.category) {
+    where.category = {
+      contains: filters.category,
+      mode: "insensitive",
+    };
+  }
+
+  if (filters?.status) {
+    where.status = filters.status;
+  }
+
+  if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
+    where.price = {};
+    if (filters.minPrice !== undefined) where.price.gte = filters.minPrice;
+    if (filters.maxPrice !== undefined) where.price.lte = filters.maxPrice;
+  }
+
+  if (filters && !filters.includeExpired) {
+    where.validUntil = {
+      gte: new Date(),
+    };
+  }
 
   const [products, totalCount] = await Promise.all([
     prisma.product.findMany({
