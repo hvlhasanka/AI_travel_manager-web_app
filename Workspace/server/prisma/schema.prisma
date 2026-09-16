@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  productId      String    @id @default(uuid())
+  productName    String
+  destination    String
+  category       String
+  description    String
+  price          Float
+  inventoryCount Int       @default(0)
+  validFrom      DateTime
+  validUntil     DateTime
+  status         String    @default("ACTIVE")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
