@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { zodResponseFormat } from "openai/helpers/zod";
 import * as productData from "../data/product.data";
-import { aiSearchFiltersSchema } from "../schema/product.schema";
+import {
+  aiSearchFiltersSchema,
+  aiGenerateProductSchema,
+} from "../schema/product.schema";
 import openai from "../config/openai";
 
 export const createProductHandler = async (req: Request, res: Response) => {
@@ -142,6 +145,43 @@ export const aiSearchHandler = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error in AI search:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const aiGenerateProductHandler = async (req: Request, res: Response) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    const aiResponse = await openai.chat.completions.parse({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert travel product creator. Extract or generate travel product details based on the user's natural language description. Provide all fields for a product creation form. If a specific detail is missing, make a reasonable guess or leave it as an empty string (or 0 for numbers). Use ISO datetime for dates.`,
+        },
+        { role: "user", content: prompt },
+      ],
+      response_format: zodResponseFormat(
+        aiGenerateProductSchema,
+        "product_details",
+      ),
+    });
+
+    const generatedProduct = aiResponse.choices[0].message.parsed;
+
+    if (!generatedProduct) {
+      return res
+        .status(500)
+        .json({ error: "Failed to generate product details from AI" });
+    }
+
+    res.status(200).json(generatedProduct);
+  } catch (error) {
+    console.error("Error in AI generate product:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

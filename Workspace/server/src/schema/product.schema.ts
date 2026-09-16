@@ -41,3 +41,23 @@ export const aiSearchFiltersSchema = z.object({
     .optional()
     .describe("The status mentioned (e.g. 'Active')."),
 });
+
+export const aiGenerateProductSchema = z.object({
+  productName: z.string().describe("The name of the product or package."),
+  destination: z.string().describe("The destination city or location."),
+  category: z.string().describe("The type or category of the product."),
+  description: z.string().describe("A detailed description of the product."),
+  price: z.number().describe("The price of the product."),
+  inventoryCount: z.number().describe("The inventory count of the product."),
+  validFrom: z
+    .string()
+    .describe(
+      "The start date in ISO format, if mentioned, otherwise empty string.",
+    ),
+  validUntil: z
+    .string()
+    .describe(
+      "The end date in ISO format, if mentioned, otherwise empty string.",
+    ),
+  status: z.string().describe("The status, e.g., 'ACTIVE' or 'INACTIVE'."),
+});
