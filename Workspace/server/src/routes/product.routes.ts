@@ -6,6 +6,7 @@ import {
   deleteProductHandler,
   aiSearchHandler,
   aiGenerateProductHandler,
+  getProductStatsHandler,
 } from "../controllers/product.controller";
 import { validateRequest } from "../middleware/validateRequest";
 import { productSchema, updateProductSchema } from "../schema/product.schema";
@@ -13,6 +14,7 @@ import { productSchema, updateProductSchema } from "../schema/product.schema";
 const router = Router();
 
 router.get("/list", getProductsHandler);
+router.get("/stats", getProductStatsHandler);
 router.post("/ai-search", aiSearchHandler);
 router.post("/ai-generate", aiGenerateProductHandler);
 router.post("/create", validateRequest(productSchema), createProductHandler);

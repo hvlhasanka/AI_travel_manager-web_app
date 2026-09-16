@@ -185,3 +185,13 @@ export const aiGenerateProductHandler = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getProductStatsHandler = async (req: Request, res: Response) => {
+  try {
+    const stats = await productData.getProductStats();
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error("Error fetching product stats:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

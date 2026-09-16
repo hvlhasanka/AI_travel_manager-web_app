@@ -106,3 +106,37 @@ export const deleteProduct = async (productId: string) => {
     where: { productId },
   });
 };
+
+export const getProductStats = async () => {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [totalCount, thisMonthCount, activeCount, expiredCount] =
+    await Promise.all([
+      prisma.product.count(),
+      prisma.product.count({
+        where: {
+          createdAt: {
+            gte: startOfMonth,
+          },
+        },
+      }),
+      prisma.product.count({
+        where: {
+          status: "ACTIVE",
+        },
+      }),
+      prisma.product.count({
+        where: {
+          status: "EXPIRED",
+        },
+      }),
+    ]);
+
+  return {
+    totalCount,
+    thisMonthCount,
+    activeCount,
+    expiredCount,
+  };
+};
