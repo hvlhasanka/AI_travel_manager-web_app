@@ -16,3 +16,28 @@ export const updateProductSchema = productSchema.partial();
 
 export type CreateProductInput = z.infer<typeof productSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
+
+export const aiSearchFiltersSchema = z.object({
+  destination: z
+    .string()
+    .optional()
+    .describe("The destination city or location mentioned in the query."),
+  category: z
+    .string()
+    .optional()
+    .describe(
+      "The type or category of product/package (e.g. 'Dinner Buffet', 'Family Package').",
+    ),
+  minPrice: z
+    .number()
+    .optional()
+    .describe("The minimum price mentioned, if any."),
+  maxPrice: z
+    .number()
+    .optional()
+    .describe("The maximum price or budget mentioned, if any."),
+  status: z
+    .string()
+    .optional()
+    .describe("The status mentioned (e.g. 'Active')."),
+});

@@ -1,4 +1,5 @@
 import prisma from "../config/db";
+import { Prisma } from "@prisma/client";
 import {
   CreateProductInput,
   UpdateProductInput,
@@ -26,7 +27,6 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   status?: string;
-  includeExpired?: boolean;
 }
 
 export const getProducts = async (
@@ -37,7 +37,11 @@ export const getProducts = async (
 ) => {
   const skip = (page - 1) * limit;
 
-  const where: any = {};
+  const where: Prisma.ProductWhereInput = {
+    validUntil: {
+      gte: new Date(),
+    },
+  };
 
   if (searchValue) {
     where.productName = {
@@ -68,12 +72,6 @@ export const getProducts = async (
     where.price = {};
     if (filters.minPrice !== undefined) where.price.gte = filters.minPrice;
     if (filters.maxPrice !== undefined) where.price.lte = filters.maxPrice;
-  }
-
-  if (filters && !filters.includeExpired) {
-    where.validUntil = {
-      gte: new Date(),
-    };
   }
 
   const [products, totalCount] = await Promise.all([
