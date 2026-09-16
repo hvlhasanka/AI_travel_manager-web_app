@@ -20,10 +20,33 @@ export const createProduct = async (data: CreateProductInput) => {
   });
 };
 
-export const getProducts = async () => {
-  return await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+export const getProducts = async (
+  page: number = 1,
+  limit: number = 10,
+  searchValue?: string,
+) => {
+  const skip = (page - 1) * limit;
+
+  const where = searchValue
+    ? {
+        productName: {
+          contains: searchValue,
+          mode: "insensitive" as const,
+        },
+      }
+    : {};
+
+  const [products, totalCount] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return { products, totalCount };
 };
 
 export const updateProduct = async (

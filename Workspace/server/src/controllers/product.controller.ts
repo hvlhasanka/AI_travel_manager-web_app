@@ -13,8 +13,25 @@ export const createProductHandler = async (req: Request, res: Response) => {
 
 export const getProductsHandler = async (req: Request, res: Response) => {
   try {
-    const products = await productData.getProducts();
-    res.status(200).json(products);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const searchValue = req.query.searchValue as string | undefined;
+
+    const { products, totalCount } = await productData.getProducts(
+      page,
+      limit,
+      searchValue,
+    );
+
+    res.status(200).json({
+      data: products,
+      pagination: {
+        total: totalCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ error: "Internal server error" });
