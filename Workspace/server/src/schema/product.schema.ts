@@ -12,4 +12,7 @@ export const productSchema = z.object({
   status: z.string().default("ACTIVE"),
 });
 
+export const updateProductSchema = productSchema.partial();
+
 export type CreateProductInput = z.infer<typeof productSchema>;
+export type UpdateProductInput = z.infer<typeof updateProductSchema>;

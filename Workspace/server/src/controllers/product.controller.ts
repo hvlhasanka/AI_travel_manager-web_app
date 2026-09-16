@@ -1,12 +1,44 @@
 import { Request, Response } from "express";
 import * as productData from "../data/product.data";
 
-export const createProduct = async (req: Request, res: Response) => {
+export const createProductHandler = async (req: Request, res: Response) => {
   try {
     const product = await productData.createProduct(req.body);
     res.status(201).json(product);
   } catch (error) {
     console.error("Error creating product:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getProductsHandler = async (req: Request, res: Response) => {
+  try {
+    const products = await productData.getProducts();
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateProductHandler = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.params;
+    const product = await productData.updateProduct(productId, req.body);
+    res.status(200).json(product);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteProductHandler = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.params;
+    await productData.deleteProduct(productId);
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
