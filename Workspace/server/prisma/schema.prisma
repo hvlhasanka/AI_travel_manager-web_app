@@ -8,16 +8,22 @@ datasource db {
 }
 
 model Product {
-  productId      String    @id @default(uuid())
+  productId      String   @id @default(uuid())
   productName    String
   destination    String
   category       String
   description    String
   price          Float
-  inventoryCount Int       @default(0)
+  inventoryCount Int      @default(0)
   validFrom      DateTime
   validUntil     DateTime
-  status         String    @default("ACTIVE")
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  status         String   @default("ACTIVE")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([validUntil])
+  @@index([category])
+  @@index([price])
 }
