@@ -10,7 +10,7 @@ export default function HeroHeader() {
           className="h-16 md:h-20 w-auto object-contain"
         />
       </div>
-      <h1 className="text-white text-4xl md:text-5xl font-black tracking-widest uppercase drop-shadow-xl">
+      <h1 className="text-white text-4xl md:text-5xl font-bold tracking-widest uppercase drop-shadow-xl">
         Travel Manager
       </h1>
     </div>

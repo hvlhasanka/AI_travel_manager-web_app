@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import StatCard from "./StatCard";
+import Banner from "./Banner";
 
 import { fetchStats } from "../services/product.service";
 
@@ -35,23 +36,41 @@ export default function StatCardSection() {
 
   if (isError || !data) {
     return (
-      <div className="w-full max-w-5xl px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard value="-" label="Total Products" badge="- this month" />
-        <StatCard value="-" label="Active Products" />
-        <StatCard value="-" label="Expired Products" />
-      </div>
+      <>
+        <Banner type="error" message="Failed to load product statistics." />
+        <div className="w-full max-w-5xl px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatCard
+            value="-"
+            label="Total Products"
+            badge="- this month"
+            isLabelBold
+          />
+          <StatCard value="-" label="Active Products" isLabelBold />
+          <StatCard value="-" label="Expired Products" />
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-      <StatCard
-        value={data.totalCount.toString()}
-        label="Total Products"
-        badge={`+${data.thisMonthCount} this month`}
-      />
-      <StatCard value={data.activeCount.toString()} label="Active Products" />
-      <StatCard value={data.expiredCount.toString()} label="Expired Products" />
-    </div>
+    <>
+      <div className="w-full max-w-5xl px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard
+          value={data.totalCount.toString()}
+          label="Total Products"
+          badge={`+${data.thisMonthCount} this month`}
+          isLabelBold
+        />
+        <StatCard
+          value={data.activeCount.toString()}
+          label="Active Products"
+          isLabelBold
+        />
+        <StatCard
+          value={data.expiredCount.toString()}
+          label="Expired Products"
+        />
+      </div>
+    </>
   );
 }
