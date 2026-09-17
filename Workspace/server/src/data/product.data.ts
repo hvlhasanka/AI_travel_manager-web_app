@@ -5,9 +5,16 @@ import {
   UpdateProductInput,
 } from "../schema/product.schema";
 
+import { customAlphabet } from "nanoid";
+
+const nanoid = customAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 8);
+
 export const createProduct = async (data: CreateProductInput) => {
+  const productId = nanoid();
+
   return await prisma.product.create({
     data: {
+      productId,
       productName: data.productName,
       destination: data.destination,
       category: data.category,

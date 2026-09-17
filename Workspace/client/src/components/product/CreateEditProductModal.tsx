@@ -1,29 +1,62 @@
 import { X, Sparkles } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createProduct, updateProduct } from "../../services/product.service";
 import AiOverlay from "./AiOverlay";
 import DiscardConfirmModal from "./DiscardConfirmModal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export type CreateEditProductModalData = {
+  productId?: string;
   productName: string;
   destination: string;
   category: string;
+  description: string;
   price: number;
   inventoryCount: number;
-  validFrom: string;
-  validUntil: string;
+  validFrom: Date | null;
+  validUntil: Date | null;
   status: "ACTIVE" | "INACTIVE";
 };
 
 interface CreateEditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (msg: string) => void;
+  onError?: (msg: string) => void;
   product?: CreateEditProductModalData | null; // If provided, it's edit mode
 }
+
+const getDefaultValues = (
+  prod?: CreateEditProductModalData | null,
+): CreateEditProductModalData => {
+  if (!prod) {
+    return {
+      productName: "",
+      destination: "",
+      category: "",
+      description: "",
+      price: 0,
+      inventoryCount: 0,
+      validFrom: null,
+      validUntil: null,
+      status: "ACTIVE",
+    };
+  }
+  return {
+    ...prod,
+    validFrom: prod.validFrom ? new Date(prod.validFrom) : null,
+    validUntil: prod.validUntil ? new Date(prod.validUntil) : null,
+  };
+};
 
 export default function CreateEditProductModal({
   isOpen,
   onClose,
+  onSuccess,
+  onError,
   product,
 }: CreateEditProductModalProps) {
   const [isAiGenerateOpen, setIsAiGenerateOpen] = useState(false);
@@ -31,38 +64,53 @@ export default function CreateEditProductModal({
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setValue,
     reset,
     formState: { isDirty },
   } = useForm<CreateEditProductModalData>({
-    defaultValues: product || {
-      productName: "",
-      destination: "",
-      category: "",
-      price: 0,
-      inventoryCount: 0,
-      validFrom: "",
-      validUntil: "",
-      status: "ACTIVE",
+    defaultValues: getDefaultValues(product),
+  });
+
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      onClose();
+      if (onSuccess) onSuccess("Product created successfully!");
+    },
+    onError: (error: Error) => {
+      console.error("Failed to create product:", error);
+      if (onError) onError(error.message || "Failed to create product");
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({
+      productId,
+      data,
+    }: {
+      productId: string;
+      data: Parameters<typeof updateProduct>[1];
+    }) => updateProduct(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      onClose();
+      if (onSuccess) onSuccess("Product updated successfully!");
+    },
+    onError: (error: Error) => {
+      console.error("Failed to update product:", error);
+      if (onError) onError(error.message || "Failed to update product");
     },
   });
 
   useEffect(() => {
     if (isOpen) {
-      reset(
-        product || {
-          productName: "",
-          destination: "",
-          category: "",
-          price: 0,
-          inventoryCount: 0,
-          validFrom: "",
-          validUntil: "",
-          status: "ACTIVE",
-        },
-      );
+      reset(getDefaultValues(product));
       setShowDiscardConfirm(false);
     }
   }, [isOpen, product, reset]);
@@ -81,7 +129,21 @@ export default function CreateEditProductModal({
 
   const onSubmit = (data: CreateEditProductModalData) => {
     console.log("Saving Product:", data);
-    onClose();
+
+    const payload = {
+      ...data,
+      validFrom: data.validFrom ? data.validFrom.toISOString() : "",
+      validUntil: data.validUntil ? data.validUntil.toISOString() : "",
+    };
+
+    if (isEdit && data.productId) {
+      updateMutation.mutate({
+        productId: data.productId,
+        data: payload as Parameters<typeof updateProduct>[1],
+      });
+    } else {
+      createMutation.mutate(payload as Parameters<typeof createProduct>[0]);
+    }
   };
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -105,7 +167,7 @@ export default function CreateEditProductModal({
               <button
                 type="button"
                 onClick={() => setIsAiGenerateOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
                 Generate with AI
@@ -113,7 +175,7 @@ export default function CreateEditProductModal({
               <button
                 type="button"
                 onClick={handleClose}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors -mr-2"
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors -mr-2 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -154,8 +216,18 @@ export default function CreateEditProductModal({
                   <label className="text-sm font-semibold text-slate-600">
                     Category <span className="text-red-500">*</span>
                   </label>
+                  <input
+                    type="text"
+                    {...register("category", { required: true })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-slate-600">
+                    Description <span className="text-red-500">*</span>
+                  </label>
                   <textarea
-                    {...register("category")}
+                    {...register("description", { required: true })}
                     rows={3}
                     className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
                   />
@@ -222,20 +294,42 @@ export default function CreateEditProductModal({
                   <label className="text-sm font-semibold text-slate-600">
                     Valid From <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="date"
-                    {...register("validFrom", { required: true })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  <Controller
+                    control={control}
+                    name="validFrom"
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <DatePicker
+                        selected={field.value}
+                        onChange={(date: Date | null) => field.onChange(date)}
+                        dateFormat="dd-MM-yyyy"
+                        placeholderText="DD-MM-YYYY"
+                        strictParsing={true}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        wrapperClassName="w-full"
+                      />
+                    )}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-slate-600">
                     Valid Until <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="date"
-                    {...register("validUntil", { required: true })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  <Controller
+                    control={control}
+                    name="validUntil"
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <DatePicker
+                        selected={field.value}
+                        onChange={(date: Date | null) => field.onChange(date)}
+                        dateFormat="dd-MM-yyyy"
+                        placeholderText="DD-MM-YYYY"
+                        strictParsing={true}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        wrapperClassName="w-full"
+                      />
+                    )}
                   />
                 </div>
               </div>
@@ -248,7 +342,7 @@ export default function CreateEditProductModal({
                   <button
                     type="button"
                     onClick={() => setValue("status", "ACTIVE")}
-                    className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                       status === "ACTIVE"
                         ? "bg-white text-orange-600 shadow-sm"
                         : "text-slate-500 hover:text-slate-700"
@@ -259,7 +353,7 @@ export default function CreateEditProductModal({
                   <button
                     type="button"
                     onClick={() => setValue("status", "INACTIVE")}
-                    className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                       status === "INACTIVE"
                         ? "bg-white text-orange-600 shadow-sm"
                         : "text-slate-500 hover:text-slate-700"
@@ -276,15 +370,18 @@ export default function CreateEditProductModal({
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-6 py-2.5 font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                className="px-6 py-2.5 font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 font-semibold text-white bg-orange-600 hover:bg-orange-700 rounded-xl transition-colors shadow-sm"
+                disabled={createMutation.isPending || updateMutation.isPending}
+                className="px-6 py-2.5 font-semibold text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors shadow-sm cursor-pointer"
               >
-                Save Product
+                {createMutation.isPending || updateMutation.isPending
+                  ? "Saving..."
+                  : "Save Product"}
               </button>
             </div>
           </form>
@@ -300,7 +397,7 @@ export default function CreateEditProductModal({
         }}
         title="Discard changes?"
         description="You have unsaved changes. Are you sure you want to close and discard them?"
-        cancelText="Keep Editing"
+        cancelText="Cancel"
       />
 
       <AiOverlay

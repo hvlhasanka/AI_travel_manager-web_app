@@ -2,12 +2,17 @@ import ProductsTable from "./ProductsTable";
 import CreateEditProductModal from "./CreateEditProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
-import { Sparkles, Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
+import Banner from "../Banner";
 
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [banner, setBanner] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const onSubmit = (data: FilterFormValues) => {
     console.log("Filter Data:", data);
@@ -15,6 +20,15 @@ export default function ProductsSection() {
 
   return (
     <>
+      {banner && (
+        <Banner
+          key={banner.message}
+          type={banner.type}
+          message={banner.message}
+          duration={3000}
+          onClose={() => setBanner(null)}
+        />
+      )}
       <section
         id="products-section"
         className="w-full flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-[5%] text-center"
@@ -44,7 +58,7 @@ export default function ProductsSection() {
             </div>
             <button
               onClick={() => setIsProductModalOpen(true)}
-              className="flex-shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
+              className="flex-shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
             >
               <Plus className="w-5 h-5" />
               <span className="hidden sm:inline">Create Product</span>
@@ -83,6 +97,8 @@ export default function ProductsSection() {
       <CreateEditProductModal
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
+        onSuccess={(msg) => setBanner({ type: "success", message: msg })}
+        onError={(msg) => setBanner({ type: "error", message: msg })}
       />
     </>
   );

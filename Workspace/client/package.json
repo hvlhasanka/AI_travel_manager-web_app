@@ -13,8 +13,10 @@
   "dependencies": {
     "@tanstack/react-query": "^5.103.1",
     "@tanstack/react-table": "^9.2.4",
+    "@types/react-datepicker": "^6.2.0",
     "lucide-react": "^1.46.0",
     "react": "^19.2.8",
+    "react-datepicker": "^9.1.0",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.87.0"
   },

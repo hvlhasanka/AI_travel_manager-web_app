@@ -5,12 +5,14 @@ interface BannerProps {
   type: "success" | "error";
   message: string;
   duration?: number;
+  onClose?: () => void;
 }
 
 export default function Banner({
   type,
   message,
   duration = 8000,
+  onClose,
 }: BannerProps) {
   const [showBanner, setShowBanner] = useState(true);
   const [isHiding, setIsHiding] = useState(false);
@@ -29,6 +31,7 @@ export default function Banner({
   const handleAnimationEnd = () => {
     if (isHiding) {
       setShowBanner(false);
+      if (onClose) onClose();
     }
   };
 
@@ -38,7 +41,7 @@ export default function Banner({
 
   return (
     <div
-      className={`fixed top-4 left-4 right-4 z-50 ${isHiding ? "animate-slide-up" : "animate-slide-down"}`}
+      className={`fixed top-4 left-4 right-4 z-[100] ${isHiding ? "animate-slide-up" : "animate-slide-down"}`}
       onAnimationEnd={handleAnimationEnd}
     >
       <div

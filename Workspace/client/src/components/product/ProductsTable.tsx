@@ -16,7 +16,7 @@ const columns = helper.columns([
   helper.accessor("productId", {
     header: "Product ID",
     cell: (info) => (
-      <span className="text-xs font-mono text-slate-500">
+      <span className="text-xs text-slate-500">
         {info.getValue().slice(-6).toUpperCase()}
       </span>
     ),
@@ -52,8 +52,23 @@ const columns = helper.columns([
     cell: (info) => info.getValue(),
   }),
   helper.accessor("validUntil", {
-    header: "Validity End",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+    header: "Validity",
+    cell: (info) => (
+      <div className="flex flex-col gap-0.5">
+        <span className="text-xs text-slate-500">
+          From:{" "}
+          <span className="font-semibold text-slate-700">
+            {new Date(info.row.original.validFrom).toLocaleDateString()}
+          </span>
+        </span>
+        <span className="text-xs text-slate-500">
+          Until:{" "}
+          <span className="font-semibold text-slate-700 ml-1">
+            {new Date(info.getValue()).toLocaleDateString()}
+          </span>
+        </span>
+      </div>
+    ),
   }),
   helper.accessor("status", {
     header: "Status",

@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Product {
-  productId      String   @id @default(uuid())
+  productId      String   @id
   productName    String
   destination    String
   category       String

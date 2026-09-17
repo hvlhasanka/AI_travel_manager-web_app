@@ -111,7 +111,7 @@ export default function ProductFilter({ onFilter }: ProductFilterProps) {
                 key={s}
                 type="button"
                 onClick={() => setValue("status", s)}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-colors cursor-pointer ${
                   status === s
                     ? "bg-orange-500 text-white border-orange-500"
                     : "bg-white text-slate-600 border-slate-300 hover:bg-slate-50"
@@ -125,9 +125,9 @@ export default function ProductFilter({ onFilter }: ProductFilterProps) {
 
         <button
           type="submit"
-          className="mt-4 w-full py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition-colors shadow-sm"
+          className="mt-4 w-full py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition-colors shadow-sm cursor-pointer"
         >
-          Apply Filters
+          Apply
         </button>
       </form>
     </div>
