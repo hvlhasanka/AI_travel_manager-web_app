@@ -126,20 +126,28 @@ export const aiSearchHandler = async (req: Request, res: Response) => {
       return res.status(500).json({ error: "Failed to parse filters from AI" });
     }
 
+    const cleanedFilters = {
+      destination: extractedFilters.destination || undefined,
+      category: extractedFilters.category || undefined,
+      minPrice: extractedFilters.minPrice || undefined,
+      maxPrice: extractedFilters.maxPrice || undefined,
+      status: extractedFilters.status || undefined,
+    };
+
     const { products, totalCount } = await productData.getProducts(
       1,
       20,
       undefined,
-      extractedFilters,
+      cleanedFilters,
     );
 
     res.status(200).json({
       data: products,
-      appliedFilters: extractedFilters,
+      appliedFilters: cleanedFilters,
       pagination: {
         total: totalCount,
         page: 1,
-        limit: 20,
+        limit: 10,
         totalPages: Math.ceil(totalCount / 20),
       },
     });

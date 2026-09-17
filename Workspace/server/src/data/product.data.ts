@@ -29,11 +29,11 @@ export const createProduct = async (data: CreateProductInput) => {
 };
 
 export interface ProductFilters {
-  destination?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  status?: string;
+  destination?: string | null;
+  category?: string | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  status?: string | null;
 }
 
 export const getProducts = async (
@@ -75,10 +75,10 @@ export const getProducts = async (
     where.status = filters.status;
   }
 
-  if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
+  if (filters?.minPrice != null || filters?.maxPrice != null) {
     where.price = {};
-    if (filters.minPrice !== undefined) where.price.gte = filters.minPrice;
-    if (filters.maxPrice !== undefined) where.price.lte = filters.maxPrice;
+    if (filters.minPrice != null) where.price.gte = filters.minPrice;
+    if (filters.maxPrice != null) where.price.lte = filters.maxPrice;
   }
 
   const [products, totalCount] = await Promise.all([

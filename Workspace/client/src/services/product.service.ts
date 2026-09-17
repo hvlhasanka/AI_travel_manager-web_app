@@ -4,6 +4,7 @@ import type {
   GetProductsResponse,
 } from "../types/product.types";
 import type { FilterFormValues } from "../components/product/ProductFilter";
+import { MAX_PRICE } from "../constants";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -38,7 +39,7 @@ export const fetchProducts = async (
     if (
       filters.maxPrice !== undefined &&
       filters.maxPrice !== null &&
-      filters.maxPrice < 100000
+      filters.maxPrice < MAX_PRICE
     )
       queryParams.append("maxPrice", filters.maxPrice.toString());
     if (filters.status && filters.status !== "ALL")
@@ -128,4 +129,32 @@ export const deleteProduct = async (
       "Failed to delete product(s)";
     throw new Error(errorMsg);
   }
+};
+
+export const aiSearchProducts = async (
+  prompt: string,
+): Promise<{
+  data: Product[];
+  appliedFilters: FilterFormValues;
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}> => {
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/ai-search`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    },
+  );
+  if (!response.ok) {
+    throw new Error("Failed to perform AI search");
+  }
+  return response.json();
 };

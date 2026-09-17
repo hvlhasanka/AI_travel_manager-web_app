@@ -142,6 +142,8 @@ export default function ProductsTable({
   const { data, isLoading, isError } = useQuery({
     queryKey: ["products", page, filters],
     queryFn: () => fetchProducts(page, limit, filters),
+    // Prevent immediate background refetches by keeping data fresh for 1 minute
+    staleTime: 60 * 1000,
   });
 
   const totalCount = data?.totalCount || 0;

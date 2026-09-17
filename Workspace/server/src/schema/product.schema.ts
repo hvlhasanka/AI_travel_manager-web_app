@@ -26,25 +26,25 @@ export const deleteProductSchema = z.object({
 export const aiSearchFiltersSchema = z.object({
   destination: z
     .string()
-    .optional()
+    .nullable()
     .describe("The destination city or location mentioned in the query."),
   category: z
     .string()
-    .optional()
+    .nullable()
     .describe(
       "The type or category of product/package (e.g. 'Dinner Buffet', 'Family Package').",
     ),
   minPrice: z
     .number()
-    .optional()
+    .nullable()
     .describe("The minimum price mentioned, if any."),
   maxPrice: z
     .number()
-    .optional()
+    .nullable()
     .describe("The maximum price or budget mentioned, if any."),
   status: z
     .string()
-    .optional()
+    .nullable()
     .describe("The status mentioned (e.g. 'Active')."),
 });
 

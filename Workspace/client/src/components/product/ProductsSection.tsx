@@ -4,11 +4,15 @@ import ViewProductModal from "./ViewProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
 import { Plus, Sparkles, Pencil, Trash2, Filter } from "lucide-react";
+import { MAX_PRICE } from "../../constants";
 import { useState } from "react";
 import Banner from "../Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteProduct } from "../../services/product.service";
+import {
+  deleteProduct,
+  aiSearchProducts,
+} from "../../services/product.service";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import type { Product } from "../../types/product.types";
 
@@ -99,9 +103,48 @@ export default function ProductsSection() {
   };
 
   const [filters, setFilters] = useState<FilterFormValues | null>(null);
+  const [isAiSearching, setIsAiSearching] = useState(false);
 
   const onSubmit = (data: FilterFormValues) => {
     setFilters(data);
+  };
+
+  const handleAiSearch = async (query: string) => {
+    setIsAiSearching(true);
+    try {
+      const response = await aiSearchProducts(query);
+
+      const rawFilters = response.appliedFilters as Partial<FilterFormValues>;
+      const newFilters: FilterFormValues = {
+        product: rawFilters.product || "",
+        destination: rawFilters.destination || "",
+        category: rawFilters.category || "",
+        minPrice: rawFilters.minPrice ?? 0,
+        maxPrice: rawFilters.maxPrice ?? MAX_PRICE,
+        status: rawFilters.status || "ALL",
+      };
+
+      setFilters(newFilters);
+
+      queryClient.setQueryData(["products", 1, newFilters], {
+        products: response.data,
+        totalCount: response.pagination.total,
+      });
+
+      setIsAiSearchOpen(false);
+      setIsFilterOpen(true);
+      setBanner({
+        type: "success",
+        message: "AI Search applied successfully!",
+      });
+    } catch {
+      setBanner({
+        type: "error",
+        message: "Failed to perform AI search. Please try again.",
+      });
+    } finally {
+      setIsAiSearching(false);
+    }
   };
 
   return (
@@ -222,6 +265,7 @@ export default function ProductsSection() {
             onFilter={onSubmit}
             onReset={() => setFilters(null)}
             className={isFilterOpen ? "flex" : "hidden"}
+            externalFilters={filters}
           />
         </div>
       </section>
@@ -237,10 +281,8 @@ export default function ProductsSection() {
           "Show products below LKR 10,000",
           "Show airport transfer services",
         ]}
-        onSubmit={(query) => {
-          console.log("Search with AI query:", query);
-          setIsAiSearchOpen(false);
-        }}
+        onSubmit={handleAiSearch}
+        isLoading={isAiSearching}
         discardTitle="Discard query?"
         discardDescription="You have entered a search query. Are you sure you want to discard it?"
       />

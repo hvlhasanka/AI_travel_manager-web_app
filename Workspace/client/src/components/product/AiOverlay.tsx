@@ -12,6 +12,7 @@ interface AiOverlayProps {
   onSubmit: (query: string) => void;
   discardTitle: string;
   discardDescription: string;
+  isLoading?: boolean;
 }
 
 type AiFormData = {
@@ -27,6 +28,7 @@ export default function AiOverlay({
   onSubmit,
   discardTitle,
   discardDescription,
+  isLoading = false,
 }: AiOverlayProps) {
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
@@ -151,10 +153,24 @@ export default function AiOverlay({
           <div className="w-full max-w-3xl flex mt-12 animate-slide-down">
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-3 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xl px-8 py-4 rounded-[2rem] shadow-lg transition-transform hover:scale-[1.02] active:scale-95"
+              disabled={isLoading}
+              className={`w-full flex items-center justify-center gap-3 font-bold text-xl px-8 py-4 rounded-[2rem] shadow-lg transition-transform ${
+                isLoading
+                  ? "bg-orange-400 text-white/80 cursor-not-allowed"
+                  : "bg-orange-600 hover:bg-orange-700 text-white hover:scale-[1.02] active:scale-95"
+              }`}
             >
-              {buttonText}
-              <ArrowRight className="w-5 h-5" />
+              {isLoading ? (
+                <>
+                  Searching...
+                  <div className="w-5 h-5 border-2 border-white/80 border-t-transparent rounded-full animate-spin" />
+                </>
+              ) : (
+                <>
+                  {buttonText}
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
           </div>
         </form>

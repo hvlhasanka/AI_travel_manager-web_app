@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { MAX_PRICE } from "../../constants";
 
 export type FilterFormValues = {
   product: string;
@@ -13,24 +15,41 @@ interface ProductFilterProps {
   onFilter: (data: FilterFormValues) => void;
   onReset?: () => void;
   className?: string;
+  externalFilters?: FilterFormValues | null;
 }
 
 export default function ProductFilter({
   onFilter,
   onReset,
   className = "",
+  externalFilters = null,
 }: ProductFilterProps) {
   const { register, handleSubmit, watch, setValue, reset } =
     useForm<FilterFormValues>({
-      defaultValues: {
+      defaultValues: externalFilters || {
         product: "",
         destination: "",
         category: "",
         minPrice: 0,
-        maxPrice: 70000,
+        maxPrice: MAX_PRICE,
         status: "ALL",
       },
     });
+
+  useEffect(() => {
+    if (externalFilters) {
+      reset(externalFilters);
+    } else {
+      reset({
+        product: "",
+        destination: "",
+        category: "",
+        minPrice: 0,
+        maxPrice: MAX_PRICE,
+        status: "ALL",
+      });
+    }
+  }, [externalFilters, reset]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
@@ -113,7 +132,7 @@ export default function ProductFilter({
           <input
             type="range"
             min="0"
-            max="10000"
+            max={MAX_PRICE}
             {...register("maxPrice")}
             className="w-full mt-2 accent-orange-500"
           />
