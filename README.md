@@ -1,5 +1,11 @@
 # AI Travel Manager Web App
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c8a84284-0853-4c74-90f1-5d9c7903b5a6/deploy-status)](https://app.netlify.com/projects/lucaslhh-travel-manager/deploys) https://lucaslhh-travel-manager.netlify.app</br>
+![Render](https://img.shields.io/badge/API-Render-4EA674?logo=render&logoColor=white)
+https://ai-travel-manager-web-app.onrender.com</br>
+![Neon](https://img.shields.io/badge/Postgres-Neon-2E6B8A?logo=postgresql&logoColor=white)
+</br>
+
 ## 1. Description
 
 An client/server application based on a Node.js + Express API paired with a React + Vite UI for a Travel Product management application.
