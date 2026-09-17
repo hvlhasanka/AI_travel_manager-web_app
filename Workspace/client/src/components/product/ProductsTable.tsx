@@ -90,7 +90,7 @@ const columns = helper.columns([
         </span>
         <span className="text-xs text-slate-500">
           Until:{" "}
-          <span className="font-semibold text-slate-700 ml-1">
+          <span className="font-semibold text-slate-700">
             {new Date(info.getValue()).toLocaleDateString()}
           </span>
         </span>

@@ -7,6 +7,7 @@ import AiOverlay from "./AiOverlay";
 import DiscardConfirmModal from "./DiscardConfirmModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import type { Product } from "../../types/product.types";
 
 export type CreateEditProductModalData = {
   productId?: string;
@@ -26,11 +27,11 @@ interface CreateEditProductModalProps {
   onClose: () => void;
   onSuccess?: (msg: string, productId?: string) => void;
   onError?: (msg: string) => void;
-  product?: CreateEditProductModalData | null; // If provided, it's edit mode
+  product?: Product | null; // If provided, it's edit mode
 }
 
 const getDefaultValues = (
-  prod?: CreateEditProductModalData | null,
+  prod?: Product | null,
 ): CreateEditProductModalData => {
   if (!prod) {
     return {
@@ -46,9 +47,16 @@ const getDefaultValues = (
     };
   }
   return {
-    ...prod,
+    productId: prod.productId,
+    productName: prod.productName,
+    destination: prod.destination,
+    category: prod.category,
+    description: prod.description,
+    price: prod.price,
+    inventoryCount: prod.inventoryCount,
     validFrom: prod.validFrom ? new Date(prod.validFrom) : null,
     validUntil: prod.validUntil ? new Date(prod.validUntil) : null,
+    status: prod.status as "ACTIVE" | "INACTIVE",
   };
 };
 
@@ -384,7 +392,9 @@ export default function CreateEditProductModal({
               >
                 {createMutation.isPending || updateMutation.isPending
                   ? "Saving..."
-                  : "Save Product"}
+                  : isEdit
+                    ? "Save Changes"
+                    : "Create Product"}
               </button>
             </div>
           </form>

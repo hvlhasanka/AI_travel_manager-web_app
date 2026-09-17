@@ -14,6 +14,7 @@ import type { Product } from "../../types/product.types";
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [banner, setBanner] = useState<{
@@ -63,6 +64,18 @@ export default function ProductsSection() {
     }
   };
 
+  const handleEdit = () => {
+    if (selectedCount === 1) {
+      setProductToEdit(getSelectedProducts()[0]);
+      setIsProductModalOpen(true);
+    }
+  };
+
+  const handleCreate = () => {
+    setProductToEdit(null);
+    setIsProductModalOpen(true);
+  };
+
   const confirmDelete = () => {
     if (selectedCount > 0) {
       deleteMutation.mutate(selectedIds);
@@ -108,6 +121,7 @@ export default function ProductsSection() {
           <div className="flex items-center gap-3 w-full md:w-auto">
             {selectedCount === 1 && (
               <button
+                onClick={handleEdit}
                 className="flex-shrink-0 flex items-center justify-center w-10 h-10 border border-slate-300 rounded-full text-slate-600 hover:text-blue-600 hover:border-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
                 title="Edit Selected Product"
               >
@@ -137,7 +151,7 @@ export default function ProductsSection() {
               />
             </div>
             <button
-              onClick={() => setIsProductModalOpen(true)}
+              onClick={handleCreate}
               className="flex-shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
             >
               <Plus className="w-5 h-5" />
@@ -180,7 +194,11 @@ export default function ProductsSection() {
 
       <CreateEditProductModal
         isOpen={isProductModalOpen}
-        onClose={() => setIsProductModalOpen(false)}
+        onClose={() => {
+          setIsProductModalOpen(false);
+          setProductToEdit(null);
+        }}
+        product={productToEdit}
         onSuccess={(msg, productId) => {
           setBanner({ type: "success", message: msg });
           if (productId) {
