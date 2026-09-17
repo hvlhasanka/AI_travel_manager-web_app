@@ -10,6 +10,13 @@ import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 8);
 
 export const createProduct = async (data: CreateProductInput) => {
+  const validFrom = new Date(data.validFrom);
+  const validUntil = new Date(data.validUntil);
+
+  if (validUntil < validFrom) {
+    throw new Error("validUntil date cannot be before validFrom date");
+  }
+
   const productId = nanoid();
 
   return await prisma.product.create({
@@ -21,8 +28,8 @@ export const createProduct = async (data: CreateProductInput) => {
       description: data.description,
       price: data.price,
       inventoryCount: data.inventoryCount,
-      validFrom: new Date(data.validFrom),
-      validUntil: new Date(data.validUntil),
+      validFrom,
+      validUntil,
       status: data.status,
     },
   });
@@ -98,6 +105,21 @@ export const updateProduct = async (
   productId: string,
   data: UpdateProductInput,
 ) => {
+  if (data.validFrom || data.validUntil) {
+    const existing = await prisma.product.findUnique({ where: { productId } });
+    if (existing) {
+      const validFrom = data.validFrom
+        ? new Date(data.validFrom)
+        : existing.validFrom;
+      const validUntil = data.validUntil
+        ? new Date(data.validUntil)
+        : existing.validUntil;
+      if (validUntil < validFrom) {
+        throw new Error("validUntil date cannot be before validFrom date");
+      }
+    }
+  }
+
   return await prisma.product.update({
     where: { productId },
     data: {
@@ -135,7 +157,9 @@ export const getProductStats = async () => {
       }),
       prisma.product.count({
         where: {
-          status: "EXPIRED",
+          validUntil: {
+            lt: now,
+          },
         },
       }),
     ]);

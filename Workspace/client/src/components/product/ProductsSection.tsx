@@ -304,9 +304,11 @@ export default function ProductsSection() {
           setBanner({ type: "success", message: msg });
           setReturnToViewOnClose(false);
           if (productId) {
-            setHighlightedProductId(productId);
-            setAnimatedProductId(productId);
-            setTimeout(() => setAnimatedProductId(null), 5000);
+            if (!productToEdit) {
+              setHighlightedProductId(productId);
+              setAnimatedProductId(productId);
+              setTimeout(() => setAnimatedProductId(null), 5000);
+            }
           }
           if (
             updatedProduct &&

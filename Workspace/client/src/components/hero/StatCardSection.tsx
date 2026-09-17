@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import StatCard from "./StatCard";
 import Banner from "../Banner";
 
@@ -24,7 +25,19 @@ export default function StatCardSection() {
     queryFn: fetchStats,
   });
 
-  if (isLoading) {
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (isLoading) {
+      timer = setTimeout(() => setShowSkeleton(true), 0);
+    } else {
+      timer = setTimeout(() => setShowSkeleton(false), 600);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
+  if (showSkeleton) {
     return (
       <div className="w-full max-w-5xl px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCardSkeleton hasBadge />

@@ -94,7 +94,7 @@ export default function CreateEditProductModal({
         status: generated.status === "INACTIVE" ? "INACTIVE" : "ACTIVE",
       };
 
-      reset(newData);
+      reset(newData, { keepDefaultValues: true });
       setIsAiGenerateOpen(false);
     } catch (error) {
       console.error("AI Generation failed:", error);
@@ -112,7 +112,7 @@ export default function CreateEditProductModal({
     watch,
     setValue,
     reset,
-    formState: { isDirty, errors },
+    formState: { dirtyFields, errors },
   } = useForm<CreateEditProductModalData>({
     defaultValues: getDefaultValues(product),
   });
@@ -175,7 +175,7 @@ export default function CreateEditProductModal({
   const isEdit = !!product;
 
   const handleClose = () => {
-    if (isDirty) {
+    if (Object.keys(dirtyFields).length > 0) {
       setShowDiscardConfirm(true);
     } else {
       onClose();
@@ -306,21 +306,50 @@ export default function CreateEditProductModal({
                         LKR
                       </span>
                     </div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      {...register("price", {
-                        required: true,
-                        min: 0,
-                        valueAsNumber: true,
-                        onBlur: (e) => {
-                          const val = parseFloat(e.target.value);
-                          if (!isNaN(val)) {
-                            e.target.value = val.toFixed(2);
-                          }
-                        },
-                      })}
-                      className={`w-full pl-12 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.price ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                    <Controller
+                      name="price"
+                      control={control}
+                      rules={{ required: true, min: 0 }}
+                      render={({ field: { onChange, onBlur, value, ref } }) => {
+                        let formattedValue = "";
+                        if (
+                          value !== "" &&
+                          value !== null &&
+                          value !== undefined
+                        ) {
+                          const parts = value.toString().split(".");
+                          parts[0] = parts[0].replace(
+                            /\B(?=(\d{3})+(?!\d))/g,
+                            ",",
+                          );
+                          formattedValue = parts.join(".");
+                        }
+
+                        return (
+                          <input
+                            type="text"
+                            ref={ref}
+                            value={formattedValue}
+                            onChange={(e) => {
+                              const rawValue = e.target.value.replace(/,/g, "");
+                              if (rawValue === "") {
+                                onChange("");
+                                return;
+                              }
+                              if (/^\d*\.?\d*$/.test(rawValue)) {
+                                onChange(rawValue);
+                              }
+                            }}
+                            onBlur={() => {
+                              if (value !== "" && !isNaN(Number(value))) {
+                                onChange(Number(value).toFixed(2));
+                              }
+                              onBlur();
+                            }}
+                            className={`w-full pl-12 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.price ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                          />
+                        );
+                      }}
                     />
                   </div>
                 </div>
@@ -373,11 +402,22 @@ export default function CreateEditProductModal({
                   <Controller
                     control={control}
                     name="validUntil"
-                    rules={{ required: true }}
+                    rules={{
+                      required: true,
+                      validate: (value) => {
+                        // eslint-disable-next-line react-hooks/incompatible-library
+                        const from = watch("validFrom");
+                        if (from && value && value < from) {
+                          return "Cannot be before Valid From";
+                        }
+                        return true;
+                      },
+                    }}
                     render={({ field }) => (
                       <DatePicker
                         selected={field.value}
                         onChange={(date: Date | null) => field.onChange(date)}
+                        minDate={watch("validFrom") || undefined}
                         dateFormat="dd-MM-yyyy"
                         placeholderText="DD-MM-YYYY"
                         strictParsing={true}
@@ -396,7 +436,9 @@ export default function CreateEditProductModal({
                 <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl w-max">
                   <button
                     type="button"
-                    onClick={() => setValue("status", "ACTIVE")}
+                    onClick={() =>
+                      setValue("status", "ACTIVE", { shouldDirty: true })
+                    }
                     className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                       status === "ACTIVE"
                         ? "bg-white text-orange-600 shadow-sm"
@@ -407,7 +449,9 @@ export default function CreateEditProductModal({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setValue("status", "INACTIVE")}
+                    onClick={() =>
+                      setValue("status", "INACTIVE", { shouldDirty: true })
+                    }
                     className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                       status === "INACTIVE"
                         ? "bg-white text-orange-600 shadow-sm"

@@ -8,8 +8,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../../services/product.service";
 import type { Product } from "../../types/product.types";
-import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import type { FilterFormValues } from "./ProductFilter";
 
 const features = tableFeatures({ rowSelectionFeature });
@@ -74,7 +74,11 @@ const columns = helper.columns([
   }),
   helper.accessor("price", {
     header: "Price",
-    cell: (info) => `LKR ${info.getValue().toFixed(2)}`,
+    cell: (info) =>
+      `LKR ${info.getValue().toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
   }),
   helper.accessor("inventoryCount", {
     header: "Inventory",
@@ -146,6 +150,18 @@ export default function ProductsTable({
     staleTime: 60 * 1000,
   });
 
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (isLoading) {
+      timer = setTimeout(() => setShowSkeleton(true), 0);
+    } else {
+      timer = setTimeout(() => setShowSkeleton(false), 600);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+
   const totalCount = data?.totalCount || 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
@@ -193,14 +209,47 @@ export default function ProductsTable({
             ))}
           </thead>
           <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={columns.length} className="px-4 py-16 text-center">
-                  <div className="flex justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
-                  </div>
-                </td>
-              </tr>
+            {showSkeleton ? (
+              Array.from({ length: limit }).map((_, index) => (
+                <tr
+                  key={`skeleton-${index}`}
+                  className="border-b border-slate-100"
+                >
+                  {table.getHeaderGroups()[0]?.headers.map((header) => {
+                    const columnId = header.column.id;
+                    return (
+                      <td
+                        key={header.id}
+                        className={`${columnId === "emptyStart" ? "px-0 text-center" : "px-4"} py-4 ${
+                          columnId === "emptyStart"
+                            ? "sticky left-0 z-10 w-6 min-w-[1.5rem] bg-white"
+                            : columnId === "productId"
+                              ? "sticky left-6 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] bg-white"
+                              : ""
+                        }`}
+                      >
+                        <div
+                          className={`bg-slate-200 animate-pulse ${
+                            columnId === "emptyStart"
+                              ? "w-5 h-5 mx-auto rounded-[4px]"
+                              : columnId === "productId"
+                                ? "w-16 h-4 rounded"
+                                : columnId === "productName"
+                                  ? "w-32 h-4 rounded"
+                                  : columnId === "description"
+                                    ? "w-40 h-4 rounded"
+                                    : columnId === "validUntil"
+                                      ? "w-24 h-8 rounded"
+                                      : columnId === "status"
+                                        ? "w-16 h-5 rounded-full"
+                                        : "w-20 h-4 rounded"
+                          }`}
+                        ></div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
             ) : isError ? (
               <tr>
                 <td
@@ -273,7 +322,7 @@ export default function ProductsTable({
         </table>
       </div>
 
-      {!isLoading && !isError && totalCount > 0 && (
+      {!showSkeleton && !isError && totalCount > 0 && (
         <div className="flex items-center justify-between px-4 py-4 border-t border-slate-100 mt-auto">
           <div className="text-sm text-slate-500">
             Showing{" "}

@@ -99,7 +99,11 @@ export default function ViewProductModal({
                 <div>
                   <p className="text-sm text-slate-500 mb-1">Price</p>
                   <p className="font-medium text-slate-800">
-                    LKR {product.price.toFixed(2)}
+                    LKR{" "}
+                    {product.price.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </p>
                 </div>
                 <div>
