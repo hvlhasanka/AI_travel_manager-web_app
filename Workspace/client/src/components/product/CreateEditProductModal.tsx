@@ -84,6 +84,7 @@ export default function CreateEditProductModal({
     onClose();
   };
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
 
   return (
