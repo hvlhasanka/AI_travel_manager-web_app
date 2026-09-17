@@ -8,6 +8,7 @@ interface AiOverlayProps {
   onClose: () => void;
   title: string;
   buttonText: string;
+  loadingButtonText?: string;
   suggestions: string[];
   onSubmit: (query: string) => void;
   discardTitle: string;
@@ -24,6 +25,7 @@ export default function AiOverlay({
   onClose,
   title,
   buttonText,
+  loadingButtonText = "Searching...",
   suggestions,
   onSubmit,
   discardTitle,
@@ -162,7 +164,7 @@ export default function AiOverlay({
             >
               {isLoading ? (
                 <>
-                  Searching...
+                  {loadingButtonText}
                   <div className="w-5 h-5 border-2 border-white/80 border-t-transparent rounded-full animate-spin" />
                 </>
               ) : (

@@ -506,6 +506,7 @@ export default function CreateEditProductModal({
         onClose={() => setIsAiGenerateOpen(false)}
         title="Describe the new product in your own words..."
         buttonText="Generate"
+        loadingButtonText="Generating..."
         suggestions={[
           "Create a Dinner Buffet at Cinnamon Grand Colombo available until the end of this month.",
           "Add a Guided City Tour in Kandy for 5000 LKR, starting next week with 20 spots.",
