@@ -31,7 +31,7 @@ export default function ProductsSection() {
       )}
       <section
         id="products-section"
-        className="w-full flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-[5%] text-center"
+        className="w-full min-h-[95vh] flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-16 min-[1600px]:px-[5%] text-center"
       >
         <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 text-left">
           <div className="flex flex-col md:flex-row md:items-baseline gap-4">
@@ -67,7 +67,7 @@ export default function ProductsSection() {
         </div>
         <div className="w-full flex flex-col lg:flex-row gap-6 h-full min-h-[400px]">
           {/* Products Table Inner Container */}
-          <div className="w-full lg:w-[80%] h-full border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden">
+          <div className="w-full lg:w-[80%] min-h-[78vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden">
             <ProductsTable />
           </div>
           {/* Filter Inner Container */}
