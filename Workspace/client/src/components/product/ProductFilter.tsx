@@ -106,7 +106,7 @@ export default function ProductFilter({ onFilter }: ProductFilterProps) {
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-slate-700">Status</label>
           <div className="flex items-center gap-2">
-            {["ALL", "ACTIVE", "EXPIRED"].map((s) => (
+            {["ALL", "ACTIVE", "INACTIVE"].map((s) => (
               <button
                 key={s}
                 type="button"
