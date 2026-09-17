@@ -98,8 +98,10 @@ export default function ProductsSection() {
     }
   };
 
+  const [filters, setFilters] = useState<FilterFormValues | null>(null);
+
   const onSubmit = (data: FilterFormValues) => {
-    console.log("Filter Data:", data);
+    setFilters(data);
   };
 
   return (
@@ -212,15 +214,15 @@ export default function ProductsSection() {
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
               onRowClick={handleRowClick}
+              filters={filters}
             />
           </div>
           {/* Filter Inner Container */}
-          {isFilterOpen && (
-            <ProductFilter
-              onFilter={onSubmit}
-              onClose={() => setIsFilterOpen(false)}
-            />
-          )}
+          <ProductFilter
+            onFilter={onSubmit}
+            onReset={() => setFilters(null)}
+            className={isFilterOpen ? "flex" : "hidden"}
+          />
         </div>
       </section>
 

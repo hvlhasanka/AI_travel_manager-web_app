@@ -11,12 +11,14 @@ export type FilterFormValues = {
 
 interface ProductFilterProps {
   onFilter: (data: FilterFormValues) => void;
-  onClose?: () => void;
+  onReset?: () => void;
+  className?: string;
 }
 
 export default function ProductFilter({
   onFilter,
-  onClose,
+  onReset,
+  className = "",
 }: ProductFilterProps) {
   const { register, handleSubmit, watch, setValue, reset } =
     useForm<FilterFormValues>({
@@ -35,14 +37,16 @@ export default function ProductFilter({
   const maxPrice = watch("maxPrice");
 
   return (
-    <div className="w-full lg:w-[20%] h-full border-2 border-orange-200/50 rounded-3xl p-6 flex flex-col items-start overflow-y-auto">
+    <div
+      className={`w-full lg:w-[20%] h-full border-2 border-orange-200/50 rounded-3xl p-6 flex flex-col items-start overflow-y-auto ${className}`}
+    >
       <div className="w-full flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-slate-800">Filter</h3>
         <button
           type="button"
           onClick={() => {
             reset();
-            onClose?.();
+            onReset?.();
           }}
           className="text-sm font-semibold text-slate-500 hover:text-orange-600 transition-colors cursor-pointer"
         >

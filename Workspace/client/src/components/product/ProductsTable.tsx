@@ -10,6 +10,7 @@ import { fetchProducts } from "../../services/product.service";
 import type { Product } from "../../types/product.types";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import type { FilterFormValues } from "./ProductFilter";
 
 const features = tableFeatures({ rowSelectionFeature });
 const helper = createColumnHelper<typeof features, Product>();
@@ -120,19 +121,27 @@ export default function ProductsTable({
   rowSelection,
   setRowSelection,
   onRowClick,
+  filters,
 }: {
   highlightedProductId?: string | null;
   animatedProductId?: string | null;
   rowSelection: RowSelectionState;
   setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>;
   onRowClick?: (product: Product) => void;
+  filters?: FilterFormValues | null;
 }) {
   const [page, setPage] = useState(1);
+  const [prevFilters, setPrevFilters] = useState(filters);
   const limit = 10;
 
+  if (filters !== prevFilters) {
+    setPage(1);
+    setPrevFilters(filters);
+  }
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["products", page],
-    queryFn: () => fetchProducts(page, limit),
+    queryKey: ["products", page, filters],
+    queryFn: () => fetchProducts(page, limit, filters),
   });
 
   const totalCount = data?.totalCount || 0;
