@@ -88,6 +88,7 @@ export default function CreateEditProductModal({
     mutationFn: createProduct,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["productStats"] });
       onClose();
       const newProductId =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,6 +112,7 @@ export default function CreateEditProductModal({
     }) => updateProduct(productId, data),
     onSuccess: (updatedProduct) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["productStats"] });
       onClose();
       if (onSuccess)
         onSuccess(

@@ -38,6 +38,7 @@ export default function ProductsSection() {
     mutationFn: (ids: string[]) => deleteProduct(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["productStats"] });
       setBanner({ type: "success", message: "Products deleted successfully!" });
       setRowSelection({});
       setIsDeleteModalOpen(false);

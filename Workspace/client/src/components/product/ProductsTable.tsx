@@ -163,11 +163,11 @@ export default function ProductsTable({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className={`px-4 py-3 text-sm font-semibold text-slate-600 uppercase tracking-wider ${
+                    className={`${header.id === "emptyStart" ? "px-0 text-center" : "px-4"} py-3 text-sm font-semibold text-slate-600 uppercase tracking-wider ${
                       header.id === "emptyStart"
-                        ? "sticky left-0 bg-white z-10 w-12 min-w-[3rem]"
+                        ? "sticky left-0 bg-white z-10 w-6 min-w-[1.5rem]"
                         : header.id === "productId"
-                          ? "sticky left-12 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                          ? "sticky left-6 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
                           : header.id === "description"
                             ? "w-[150px] min-w-[150px]"
                             : ""
@@ -231,9 +231,9 @@ export default function ProductsTable({
                             e.stopPropagation();
                           }
                         }}
-                        className={`px-4 py-4 text-sm text-slate-700 ${
+                        className={`${cell.column.id === "emptyStart" ? "px-0 text-center" : "px-4"} py-4 text-sm text-slate-700 ${
                           cell.column.id === "emptyStart"
-                            ? `sticky left-0 z-10 w-12 min-w-[3rem] ${
+                            ? `sticky left-0 z-10 w-6 min-w-[1.5rem] ${
                                 isAnimated
                                   ? "bg-orange-100"
                                   : row.getIsSelected()
@@ -241,7 +241,7 @@ export default function ProductsTable({
                                     : "bg-white group-hover:bg-slate-50"
                               }`
                             : cell.column.id === "productId"
-                              ? `sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
+                              ? `sticky left-6 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
                                   isAnimated
                                     ? "bg-orange-100"
                                     : row.getIsSelected()
