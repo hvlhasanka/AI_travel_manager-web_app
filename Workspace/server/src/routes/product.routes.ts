@@ -9,7 +9,11 @@ import {
   getProductStatsHandler,
 } from "../controllers/product.controller";
 import { validateRequest } from "../middleware/validateRequest";
-import { productSchema, updateProductSchema } from "../schema/product.schema";
+import {
+  productSchema,
+  updateProductSchema,
+  deleteProductSchema,
+} from "../schema/product.schema";
 
 const router = Router();
 
@@ -23,6 +27,10 @@ router.put(
   validateRequest(updateProductSchema),
   updateProductHandler,
 );
-router.delete("/:productId/delete", deleteProductHandler);
+router.delete(
+  "/delete",
+  validateRequest(deleteProductSchema),
+  deleteProductHandler,
+);
 
 export default router;

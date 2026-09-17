@@ -6,10 +6,15 @@ import { Plus, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import Banner from "../Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteProduct } from "../../services/product.service";
+import DeleteConfirmModal from "./DeleteConfirmModal";
+import type { Product } from "../../types/product.types";
 
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [banner, setBanner] = useState<{
     type: "success" | "error";
@@ -19,9 +24,50 @@ export default function ProductsSection() {
     string | null
   >(null);
 
-  const selectedCount = Object.keys(rowSelection).filter(
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (ids: string[]) => deleteProduct(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setBanner({ type: "success", message: "Products deleted successfully!" });
+      setRowSelection({});
+      setIsDeleteModalOpen(false);
+    },
+    onError: (error: Error) => {
+      setBanner({ type: "error", message: error.message });
+      setIsDeleteModalOpen(false);
+    },
+  });
+
+  const selectedIds = Object.keys(rowSelection).filter(
     (key) => rowSelection[key],
-  ).length;
+  );
+  const selectedCount = selectedIds.length;
+
+  const getSelectedProducts = (): Product[] => {
+    if (selectedIds.length === 0) return [];
+    const allQueries = queryClient.getQueriesData({ queryKey: ["products"] });
+    const allProducts = allQueries.flatMap(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ([, data]: any) => data?.products || [],
+    );
+    return allProducts.filter((p: Product) =>
+      selectedIds.includes(p.productId),
+    );
+  };
+
+  const handleDelete = () => {
+    if (selectedCount > 0) {
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDelete = () => {
+    if (selectedCount > 0) {
+      deleteMutation.mutate(selectedIds);
+    }
+  };
 
   const onSubmit = (data: FilterFormValues) => {
     console.log("Filter Data:", data);
@@ -29,6 +75,13 @@ export default function ProductsSection() {
 
   return (
     <>
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        selectedProducts={getSelectedProducts()}
+        isPending={deleteMutation.isPending}
+      />
       {banner && (
         <Banner
           key={banner.message}
@@ -63,7 +116,9 @@ export default function ProductsSection() {
             )}
             {selectedCount > 0 && (
               <button
-                className="flex-shrink-0 flex items-center justify-center w-10 h-10 border border-slate-300 rounded-full text-slate-600 hover:text-red-600 hover:border-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+                className="flex-shrink-0 flex items-center justify-center w-10 h-10 border border-slate-300 rounded-full text-slate-600 hover:text-red-600 hover:border-red-600 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Delete Selected Products"
               >
                 <Trash2 className="w-5 h-5" />

@@ -17,6 +17,12 @@ export const updateProductSchema = productSchema.partial();
 export type CreateProductInput = z.infer<typeof productSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 
+export const deleteProductSchema = z.object({
+  productIds: z
+    .array(z.string())
+    .min(1, "At least one product ID must be provided"),
+});
+
 export const aiSearchFiltersSchema = z.object({
   destination: z
     .string()

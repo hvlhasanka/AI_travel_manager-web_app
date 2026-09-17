@@ -108,9 +108,9 @@ export const updateProduct = async (
   });
 };
 
-export const deleteProduct = async (productId: string) => {
-  return await prisma.product.delete({
-    where: { productId },
+export const deleteProducts = async (productIds: string[]) => {
+  return await prisma.product.deleteMany({
+    where: { productId: { in: productIds } },
   });
 };
 

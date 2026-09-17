@@ -74,11 +74,11 @@ export const updateProductHandler = async (req: Request, res: Response) => {
 
 export const deleteProductHandler = async (req: Request, res: Response) => {
   try {
-    const { productId } = req.params;
-    await productData.deleteProduct(productId);
-    res.status(200).json({ message: "Product deleted successfully" });
+    const { productIds } = req.body;
+    await productData.deleteProducts(productIds);
+    res.status(200).json({ message: "Product(s) deleted successfully" });
   } catch (error) {
-    console.error("Error deleting product:", error);
+    console.error("Error deleting product(s):", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

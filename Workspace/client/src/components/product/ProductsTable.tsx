@@ -137,6 +137,7 @@ export default function ProductsTable({
     data: data?.products || [],
     columns,
     features,
+    getRowId: (row) => row.productId,
     state: {
       rowSelection,
     },

@@ -77,3 +77,28 @@ export const updateProduct = async (
   }
   return response.json();
 };
+
+export const deleteProduct = async (
+  productId: string | string[],
+): Promise<void> => {
+  const payload = {
+    productIds: Array.isArray(productId) ? productId : [productId],
+  };
+
+  const response = await fetch(`${API_URL}/travel-manager/v1/product/delete`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    const errorMsg =
+      errorData?.details?.[0]?.message ||
+      errorData?.error ||
+      "Failed to delete product(s)";
+    throw new Error(errorMsg);
+  }
+};
