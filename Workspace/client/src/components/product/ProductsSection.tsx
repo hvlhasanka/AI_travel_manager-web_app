@@ -1,5 +1,6 @@
 import ProductsTable from "./ProductsTable";
 import CreateEditProductModal from "./CreateEditProductModal";
+import ViewProductModal from "./ViewProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
 import { Plus, Sparkles, Pencil, Trash2 } from "lucide-react";
@@ -14,7 +15,10 @@ import type { Product } from "../../types/product.types";
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+  const [productToView, setProductToView] = useState<Product | null>(null);
+  const [returnToViewOnClose, setReturnToViewOnClose] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [banner, setBanner] = useState<{
@@ -24,6 +28,9 @@ export default function ProductsSection() {
   const [highlightedProductId, setHighlightedProductId] = useState<
     string | null
   >(null);
+  const [animatedProductId, setAnimatedProductId] = useState<string | null>(
+    null,
+  );
 
   const queryClient = useQueryClient();
 
@@ -34,6 +41,8 @@ export default function ProductsSection() {
       setBanner({ type: "success", message: "Products deleted successfully!" });
       setRowSelection({});
       setIsDeleteModalOpen(false);
+      setReturnToViewOnClose(false);
+      setProductToView(null);
     },
     onError: (error: Error) => {
       setBanner({ type: "error", message: error.message });
@@ -71,6 +80,11 @@ export default function ProductsSection() {
     }
   };
 
+  const handleRowClick = (product: Product) => {
+    setProductToView(product);
+    setIsViewModalOpen(true);
+  };
+
   const handleCreate = () => {
     setProductToEdit(null);
     setIsProductModalOpen(true);
@@ -90,7 +104,15 @@ export default function ProductsSection() {
     <>
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          if (returnToViewOnClose) {
+            setIsViewModalOpen(true);
+            setReturnToViewOnClose(false);
+          } else {
+            setProductToView(null);
+          }
+        }}
         onConfirm={confirmDelete}
         selectedProducts={getSelectedProducts()}
         isPending={deleteMutation.isPending}
@@ -119,6 +141,11 @@ export default function ProductsSection() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
+            {selectedCount > 1 && (
+              <div className="flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-sm font-semibold text-slate-600">
+                {selectedCount} items selected
+              </div>
+            )}
             {selectedCount === 1 && (
               <button
                 onClick={handleEdit}
@@ -164,8 +191,10 @@ export default function ProductsSection() {
           <div className="w-full lg:w-[80%] min-h-[78vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden">
             <ProductsTable
               highlightedProductId={highlightedProductId}
+              animatedProductId={animatedProductId}
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
+              onRowClick={handleRowClick}
             />
           </div>
           {/* Filter Inner Container */}
@@ -197,16 +226,54 @@ export default function ProductsSection() {
         onClose={() => {
           setIsProductModalOpen(false);
           setProductToEdit(null);
+          if (returnToViewOnClose) {
+            setIsViewModalOpen(true);
+            setReturnToViewOnClose(false);
+          } else {
+            setProductToView(null);
+          }
         }}
         product={productToEdit}
-        onSuccess={(msg, productId) => {
+        onSuccess={(msg, productId, updatedProduct) => {
           setBanner({ type: "success", message: msg });
+          setReturnToViewOnClose(false);
           if (productId) {
             setHighlightedProductId(productId);
-            setTimeout(() => setHighlightedProductId(null), 3000);
+            setAnimatedProductId(productId);
+            setTimeout(() => setAnimatedProductId(null), 5000);
+          }
+          if (
+            updatedProduct &&
+            productToView &&
+            productToView.productId === updatedProduct.productId
+          ) {
+            setProductToView(updatedProduct);
+            setIsViewModalOpen(true);
           }
         }}
         onError={(msg) => setBanner({ type: "error", message: msg })}
+      />
+
+      <ViewProductModal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setProductToView(null);
+        }}
+        product={productToView}
+        onEdit={(product) => {
+          setIsViewModalOpen(false);
+          setProductToEdit(product);
+          setReturnToViewOnClose(true);
+          setIsProductModalOpen(true);
+        }}
+        onDelete={(product) => {
+          setIsViewModalOpen(false);
+          // Set selection just to this product so confirm modal deletes it
+          setRowSelection({ [product.productId]: true });
+          setReturnToViewOnClose(true);
+          setIsDeleteModalOpen(true);
+        }}
       />
     </>
   );

@@ -23,6 +23,7 @@ const columns = helper.columns([
         type="checkbox"
         checked={info.row.getIsSelected()}
         onChange={info.row.getToggleSelectedHandler()}
+        onClick={(e) => e.stopPropagation()}
         className="w-5 h-5 rounded-[4px] border-2 border-slate-300 text-orange-500 focus:ring-orange-500 focus:ring-offset-1 transition-all cursor-pointer hover:border-orange-400 bg-white"
       />
     ),
@@ -61,7 +62,7 @@ const columns = helper.columns([
   helper.accessor("description", {
     header: "Description",
     cell: (info) => (
-      <div className="max-w-[200px] truncate" title={info.getValue()}>
+      <div className="w-[150px] min-w-[150px] truncate" title={info.getValue()}>
         {info.getValue()}
       </div>
     ),
@@ -115,12 +116,16 @@ const columns = helper.columns([
 
 export default function ProductsTable({
   highlightedProductId,
+  animatedProductId,
   rowSelection,
   setRowSelection,
+  onRowClick,
 }: {
   highlightedProductId?: string | null;
+  animatedProductId?: string | null;
   rowSelection: RowSelectionState;
   setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>;
+  onRowClick?: (product: Product) => void;
 }) {
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -163,7 +168,9 @@ export default function ProductsTable({
                         ? "sticky left-0 bg-white z-10 w-12 min-w-[3rem]"
                         : header.id === "productId"
                           ? "sticky left-12 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
-                          : ""
+                          : header.id === "description"
+                            ? "w-[150px] min-w-[150px]"
+                            : ""
                     }`}
                   >
                     {header.isPlaceholder ? null : (
@@ -203,13 +210,14 @@ export default function ProductsTable({
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => {
-                const isNew = row.original.productId === highlightedProductId;
+                const isAnimated = row.original.productId === animatedProductId;
                 return (
                   <tr
                     key={row.id}
-                    className={`group border-b border-slate-100 transition-colors ${
-                      isNew
-                        ? "bg-orange-100/50 animate-bounce"
+                    onClick={() => onRowClick?.(row.original)}
+                    className={`group border-b border-slate-100 transition-colors ${onRowClick ? "cursor-pointer" : ""} ${
+                      isAnimated
+                        ? "bg-orange-100/50 animate-bounce-horizontal"
                         : row.getIsSelected()
                           ? "bg-orange-50 hover:bg-orange-100"
                           : "hover:bg-slate-50"
@@ -218,10 +226,15 @@ export default function ProductsTable({
                     {row.getAllCells().map((cell) => (
                       <td
                         key={cell.id}
+                        onClick={(e) => {
+                          if (cell.column.id === "emptyStart") {
+                            e.stopPropagation();
+                          }
+                        }}
                         className={`px-4 py-4 text-sm text-slate-700 ${
                           cell.column.id === "emptyStart"
                             ? `sticky left-0 z-10 w-12 min-w-[3rem] ${
-                                isNew
+                                isAnimated
                                   ? "bg-orange-100"
                                   : row.getIsSelected()
                                     ? "bg-orange-50 group-hover:bg-orange-100"
@@ -229,7 +242,7 @@ export default function ProductsTable({
                               }`
                             : cell.column.id === "productId"
                               ? `sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
-                                  isNew
+                                  isAnimated
                                     ? "bg-orange-100"
                                     : row.getIsSelected()
                                       ? "bg-orange-50 group-hover:bg-orange-100"

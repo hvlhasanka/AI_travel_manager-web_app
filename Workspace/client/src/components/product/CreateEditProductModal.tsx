@@ -25,9 +25,9 @@ export type CreateEditProductModalData = {
 interface CreateEditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (msg: string, productId?: string) => void;
-  onError?: (msg: string) => void;
-  product?: Product | null; // If provided, it's edit mode
+  product?: Product | null;
+  onSuccess?: (message: string, productId?: string, product?: Product) => void;
+  onError?: (message: string) => void;
 }
 
 const getDefaultValues = (
@@ -92,7 +92,8 @@ export default function CreateEditProductModal({
       const newProductId =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (data as any)?.data?.productId || (data as any)?.productId;
-      if (onSuccess) onSuccess("Product created successfully!", newProductId);
+      if (onSuccess)
+        onSuccess("Product created successfully!", newProductId, data);
     },
     onError: (error: Error) => {
       console.error("Failed to create product:", error);
@@ -108,10 +109,15 @@ export default function CreateEditProductModal({
       productId: string;
       data: Parameters<typeof updateProduct>[1];
     }) => updateProduct(productId, data),
-    onSuccess: () => {
+    onSuccess: (updatedProduct) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
-      if (onSuccess) onSuccess("Product updated successfully!");
+      if (onSuccess)
+        onSuccess(
+          "Product updated successfully!",
+          updatedProduct.productId,
+          updatedProduct,
+        );
     },
     onError: (error: Error) => {
       console.error("Failed to update product:", error);
