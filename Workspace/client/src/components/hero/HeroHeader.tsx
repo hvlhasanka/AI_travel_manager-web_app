@@ -1,4 +1,4 @@
-import logoImage from "../../assets/logo/logo.png";
+import logoImage from "../../../assets/logo/logo.png";
 
 export default function HeroHeader() {
   return (
