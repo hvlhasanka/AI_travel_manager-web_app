@@ -3,7 +3,7 @@ import CreateEditProductModal from "./CreateEditProductModal";
 import ViewProductModal from "./ViewProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
-import { Plus, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { Plus, Sparkles, Pencil, Trash2, Filter } from "lucide-react";
 import { useState } from "react";
 import Banner from "../Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
@@ -14,6 +14,7 @@ import type { Product } from "../../types/product.types";
 
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
@@ -129,7 +130,7 @@ export default function ProductsSection() {
       )}
       <section
         id="products-section"
-        className="w-full min-h-[95vh] flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-16 min-[1600px]:px-[5%] text-center"
+        className="w-full flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-16 min-[1600px]:px-[5%] text-center"
       >
         <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 text-left">
           <div className="flex flex-col md:flex-row md:items-baseline gap-4">
@@ -179,6 +180,17 @@ export default function ProductsSection() {
               />
             </div>
             <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
+                isFilterOpen
+                  ? "bg-orange-100 text-orange-600 border-orange-200"
+                  : "bg-white text-slate-600 border-slate-300 hover:text-orange-600 hover:border-orange-300 hover:bg-orange-50"
+              }`}
+              title="Toggle Filters"
+            >
+              <Filter className="w-5 h-5" />
+            </button>
+            <button
               onClick={handleCreate}
               className="flex-shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
             >
@@ -189,7 +201,11 @@ export default function ProductsSection() {
         </div>
         <div className="w-full flex flex-col lg:flex-row gap-6 h-full min-h-[400px]">
           {/* Products Table Inner Container */}
-          <div className="w-full lg:w-[80%] min-h-[78vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden">
+          <div
+            className={`w-full ${
+              isFilterOpen ? "lg:w-[80%]" : ""
+            } min-h-[65vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
+          >
             <ProductsTable
               highlightedProductId={highlightedProductId}
               animatedProductId={animatedProductId}
@@ -199,7 +215,12 @@ export default function ProductsSection() {
             />
           </div>
           {/* Filter Inner Container */}
-          <ProductFilter onFilter={onSubmit} />
+          {isFilterOpen && (
+            <ProductFilter
+              onFilter={onSubmit}
+              onClose={() => setIsFilterOpen(false)}
+            />
+          )}
         </div>
       </section>
 

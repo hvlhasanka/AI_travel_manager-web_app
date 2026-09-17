@@ -11,11 +11,15 @@ export type FilterFormValues = {
 
 interface ProductFilterProps {
   onFilter: (data: FilterFormValues) => void;
+  onClose?: () => void;
 }
 
-export default function ProductFilter({ onFilter }: ProductFilterProps) {
-  const { register, handleSubmit, watch, setValue } = useForm<FilterFormValues>(
-    {
+export default function ProductFilter({
+  onFilter,
+  onClose,
+}: ProductFilterProps) {
+  const { register, handleSubmit, watch, setValue, reset } =
+    useForm<FilterFormValues>({
       defaultValues: {
         product: "",
         destination: "",
@@ -24,8 +28,7 @@ export default function ProductFilter({ onFilter }: ProductFilterProps) {
         maxPrice: 70000,
         status: "ALL",
       },
-    },
-  );
+    });
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
@@ -33,7 +36,19 @@ export default function ProductFilter({ onFilter }: ProductFilterProps) {
 
   return (
     <div className="w-full lg:w-[20%] h-full border-2 border-orange-200/50 rounded-3xl p-6 flex flex-col items-start overflow-y-auto">
-      <h3 className="text-xl font-bold text-slate-800 mb-6">Filter</h3>
+      <div className="w-full flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-slate-800">Filter</h3>
+        <button
+          type="button"
+          onClick={() => {
+            reset();
+            onClose?.();
+          }}
+          className="text-sm font-semibold text-slate-500 hover:text-orange-600 transition-colors cursor-pointer"
+        >
+          Reset
+        </button>
+      </div>
 
       <form
         onSubmit={handleSubmit(onFilter)}
