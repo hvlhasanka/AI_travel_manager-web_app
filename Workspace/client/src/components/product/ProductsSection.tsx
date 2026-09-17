@@ -2,17 +2,26 @@ import ProductsTable from "./ProductsTable";
 import CreateEditProductModal from "./CreateEditProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import Banner from "../Banner";
+import { type RowSelectionState } from "@tanstack/react-table";
 
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [banner, setBanner] = useState<{
     type: "success" | "error";
     message: string;
   } | null>(null);
+  const [highlightedProductId, setHighlightedProductId] = useState<
+    string | null
+  >(null);
+
+  const selectedCount = Object.keys(rowSelection).filter(
+    (key) => rowSelection[key],
+  ).length;
 
   const onSubmit = (data: FilterFormValues) => {
     console.log("Filter Data:", data);
@@ -44,6 +53,22 @@ export default function ProductsSection() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
+            {selectedCount === 1 && (
+              <button
+                className="flex-shrink-0 flex items-center justify-center w-10 h-10 border border-slate-300 rounded-full text-slate-600 hover:text-blue-600 hover:border-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                title="Edit Selected Product"
+              >
+                <Pencil className="w-5 h-5" />
+              </button>
+            )}
+            {selectedCount > 0 && (
+              <button
+                className="flex-shrink-0 flex items-center justify-center w-10 h-10 border border-slate-300 rounded-full text-slate-600 hover:text-red-600 hover:border-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                title="Delete Selected Products"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            )}
             <div className="relative w-full md:w-auto">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Sparkles className="h-5 w-5 text-orange-500" />
@@ -68,7 +93,11 @@ export default function ProductsSection() {
         <div className="w-full flex flex-col lg:flex-row gap-6 h-full min-h-[400px]">
           {/* Products Table Inner Container */}
           <div className="w-full lg:w-[80%] min-h-[78vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden">
-            <ProductsTable />
+            <ProductsTable
+              highlightedProductId={highlightedProductId}
+              rowSelection={rowSelection}
+              setRowSelection={setRowSelection}
+            />
           </div>
           {/* Filter Inner Container */}
           <ProductFilter onFilter={onSubmit} />
@@ -97,7 +126,13 @@ export default function ProductsSection() {
       <CreateEditProductModal
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
-        onSuccess={(msg) => setBanner({ type: "success", message: msg })}
+        onSuccess={(msg, productId) => {
+          setBanner({ type: "success", message: msg });
+          if (productId) {
+            setHighlightedProductId(productId);
+            setTimeout(() => setHighlightedProductId(null), 3000);
+          }
+        }}
         onError={(msg) => setBanner({ type: "error", message: msg })}
       />
     </>

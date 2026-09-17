@@ -28,7 +28,6 @@ export default function AiOverlay({
   discardTitle,
   discardDescription,
 }: AiOverlayProps) {
-  const [isAiFocused, setIsAiFocused] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
   const { register, handleSubmit, watch, setValue, reset } =
@@ -44,7 +43,6 @@ export default function AiOverlay({
     if (!isOpen) {
       reset({ query: "" });
       setShowDiscardConfirm(false);
-      setIsAiFocused(false);
     }
   }, [isOpen, reset]);
 
@@ -105,11 +103,7 @@ export default function AiOverlay({
               autoFocus
               ref={queryRef}
               onChange={queryOnChange}
-              onFocus={() => setIsAiFocused(true)}
-              onBlur={(e) => {
-                queryOnBlur(e);
-                setIsAiFocused(false);
-              }}
+              onBlur={queryOnBlur}
               {...queryRest}
               rows={2}
               className="w-full text-2xl font-medium bg-transparent border-none focus:outline-none focus:ring-0 text-slate-800 resize-none py-2"
@@ -130,7 +124,7 @@ export default function AiOverlay({
           </div>
 
           {/* Suggestions */}
-          {isAiFocused && suggestions.length > 0 && (
+          {suggestions.length > 0 && (
             <div
               className="w-full max-w-3xl mt-4 bg-white rounded-3xl shadow-xl p-6 animate-slide-down border border-slate-100"
               onMouseDown={(e) => e.preventDefault()}

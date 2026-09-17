@@ -2,6 +2,8 @@ import {
   createColumnHelper,
   tableFeatures,
   useTable,
+  rowSelectionFeature,
+  type RowSelectionState,
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../../services/product.service";
@@ -9,17 +11,42 @@ import type { Product } from "../../types/product.types";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
-const features = tableFeatures({});
+const features = tableFeatures({ rowSelectionFeature });
 const helper = createColumnHelper<typeof features, Product>();
 
 const columns = helper.columns([
+  helper.display({
+    id: "emptyStart",
+    header: "",
+    cell: (info) => (
+      <input
+        type="checkbox"
+        checked={info.row.getIsSelected()}
+        onChange={info.row.getToggleSelectedHandler()}
+        className="w-5 h-5 rounded-[4px] border-2 border-slate-300 text-orange-500 focus:ring-orange-500 focus:ring-offset-1 transition-all cursor-pointer hover:border-orange-400 bg-white"
+      />
+    ),
+  }),
   helper.accessor("productId", {
     header: "Product ID",
-    cell: (info) => (
-      <span className="text-xs text-slate-500">
-        {info.getValue().slice(-6).toUpperCase()}
-      </span>
-    ),
+    cell: (info) => {
+      const isNew =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (info.table.options.meta as any)?.highlightedProductId ===
+        info.getValue();
+      return (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">
+            {info.getValue().slice(-6).toUpperCase()}
+          </span>
+          {isNew && (
+            <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-orange-600 bg-orange-100 rounded-md">
+              NEW
+            </span>
+          )}
+        </div>
+      );
+    },
   }),
   helper.accessor("productName", {
     header: "Product",
@@ -86,7 +113,15 @@ const columns = helper.columns([
   }),
 ]);
 
-export default function ProductsTable() {
+export default function ProductsTable({
+  highlightedProductId,
+  rowSelection,
+  setRowSelection,
+}: {
+  highlightedProductId?: string | null;
+  rowSelection: RowSelectionState;
+  setRowSelection: React.Dispatch<React.SetStateAction<RowSelectionState>>;
+}) {
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -102,6 +137,14 @@ export default function ProductsTable() {
     data: data?.products || [],
     columns,
     features,
+    state: {
+      rowSelection,
+    },
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    meta: {
+      highlightedProductId,
+    },
   });
 
   return (
@@ -114,7 +157,13 @@ export default function ProductsTable() {
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-3 text-sm font-semibold text-slate-600 uppercase tracking-wider"
+                    className={`px-4 py-3 text-sm font-semibold text-slate-600 uppercase tracking-wider ${
+                      header.id === "emptyStart"
+                        ? "sticky left-0 bg-white z-10 w-12 min-w-[3rem]"
+                        : header.id === "productId"
+                          ? "sticky left-12 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                          : ""
+                    }`}
                   >
                     {header.isPlaceholder ? null : (
                       <table.FlexRender header={header} />
@@ -152,21 +201,48 @@ export default function ProductsTable() {
                 </td>
               </tr>
             ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
-                >
-                  {row.getAllCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="px-4 py-4 text-sm text-slate-700"
-                    >
-                      <table.FlexRender cell={cell} />
-                    </td>
-                  ))}
-                </tr>
-              ))
+              table.getRowModel().rows.map((row) => {
+                const isNew = row.original.productId === highlightedProductId;
+                return (
+                  <tr
+                    key={row.id}
+                    className={`group border-b border-slate-100 transition-colors ${
+                      isNew
+                        ? "bg-orange-100/50 animate-bounce"
+                        : row.getIsSelected()
+                          ? "bg-orange-50 hover:bg-orange-100"
+                          : "hover:bg-slate-50"
+                    }`}
+                  >
+                    {row.getAllCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={`px-4 py-4 text-sm text-slate-700 ${
+                          cell.column.id === "emptyStart"
+                            ? `sticky left-0 z-10 w-12 min-w-[3rem] ${
+                                isNew
+                                  ? "bg-orange-100"
+                                  : row.getIsSelected()
+                                    ? "bg-orange-50 group-hover:bg-orange-100"
+                                    : "bg-white group-hover:bg-slate-50"
+                              }`
+                            : cell.column.id === "productId"
+                              ? `sticky left-12 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
+                                  isNew
+                                    ? "bg-orange-100"
+                                    : row.getIsSelected()
+                                      ? "bg-orange-50 group-hover:bg-orange-100"
+                                      : "bg-white group-hover:bg-slate-50"
+                                }`
+                              : ""
+                        }`}
+                      >
+                        <table.FlexRender cell={cell} />
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

@@ -24,7 +24,7 @@ export type CreateEditProductModalData = {
 interface CreateEditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (msg: string) => void;
+  onSuccess?: (msg: string, productId?: string) => void;
   onError?: (msg: string) => void;
   product?: CreateEditProductModalData | null; // If provided, it's edit mode
 }
@@ -78,10 +78,13 @@ export default function CreateEditProductModal({
 
   const createMutation = useMutation({
     mutationFn: createProduct,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
-      if (onSuccess) onSuccess("Product created successfully!");
+      const newProductId =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (data as any)?.data?.productId || (data as any)?.productId;
+      if (onSuccess) onSuccess("Product created successfully!", newProductId);
     },
     onError: (error: Error) => {
       console.error("Failed to create product:", error);
