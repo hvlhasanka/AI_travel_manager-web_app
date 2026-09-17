@@ -2,7 +2,11 @@ import { X, Sparkles } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct, updateProduct } from "../../services/product.service";
+import {
+  createProduct,
+  updateProduct,
+  aiGenerateProduct,
+} from "../../services/product.service";
 import AiOverlay from "./AiOverlay";
 import DiscardConfirmModal from "./DiscardConfirmModal";
 import DatePicker from "react-datepicker";
@@ -15,8 +19,8 @@ export type CreateEditProductModalData = {
   destination: string;
   category: string;
   description: string;
-  price: number;
-  inventoryCount: number;
+  price: number | "";
+  inventoryCount: number | "";
   validFrom: Date | null;
   validUntil: Date | null;
   status: "ACTIVE" | "INACTIVE";
@@ -39,8 +43,8 @@ const getDefaultValues = (
       destination: "",
       category: "",
       description: "",
-      price: 0,
-      inventoryCount: 0,
+      price: "",
+      inventoryCount: "",
       validFrom: null,
       validUntil: null,
       status: "ACTIVE",
@@ -69,6 +73,37 @@ export default function CreateEditProductModal({
 }: CreateEditProductModalProps) {
   const [isAiGenerateOpen, setIsAiGenerateOpen] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+
+  const handleAiGenerate = async (query: string) => {
+    setIsAiGenerating(true);
+    try {
+      const generated = await aiGenerateProduct(query);
+
+      const newData: CreateEditProductModalData = {
+        productName: generated.productName || "",
+        destination: generated.destination || "",
+        category: generated.category || "",
+        description: generated.description || "",
+        price: generated.price ?? "",
+        inventoryCount: generated.inventoryCount ?? "",
+        validFrom: generated.validFrom ? new Date(generated.validFrom) : null,
+        validUntil: generated.validUntil
+          ? new Date(generated.validUntil)
+          : null,
+        status: generated.status === "INACTIVE" ? "INACTIVE" : "ACTIVE",
+      };
+
+      reset(newData);
+      setIsAiGenerateOpen(false);
+    } catch (error) {
+      console.error("AI Generation failed:", error);
+      if (onError)
+        onError("Failed to generate product via AI. Please try again.");
+    } finally {
+      setIsAiGenerating(false);
+    }
+  };
 
   const {
     register,
@@ -77,7 +112,7 @@ export default function CreateEditProductModal({
     watch,
     setValue,
     reset,
-    formState: { isDirty },
+    formState: { isDirty, errors },
   } = useForm<CreateEditProductModalData>({
     defaultValues: getDefaultValues(product),
   });
@@ -130,6 +165,7 @@ export default function CreateEditProductModal({
   useEffect(() => {
     if (isOpen) {
       reset(getDefaultValues(product));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowDiscardConfirm(false);
     }
   }, [isOpen, product, reset]);
@@ -151,6 +187,8 @@ export default function CreateEditProductModal({
 
     const payload = {
       ...data,
+      price: Number(data.price) || 0,
+      inventoryCount: Number(data.inventoryCount) || 0,
       validFrom: data.validFrom ? data.validFrom.toISOString() : "",
       validUntil: data.validUntil ? data.validUntil.toISOString() : "",
     };
@@ -165,15 +203,11 @@ export default function CreateEditProductModal({
     }
   };
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4"
-        onClick={handleClose}
-      >
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
         <div
           className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-down flex flex-col"
           onClick={(e) => e.stopPropagation()}
@@ -183,14 +217,16 @@ export default function CreateEditProductModal({
               {isEdit ? "Edit Product" : "Create Product"}
             </h2>
             <div className="flex items-center gap-6">
-              <button
-                type="button"
-                onClick={() => setIsAiGenerateOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4" />
-                Generate with AI
-              </button>
+              {!isEdit && (
+                <button
+                  type="button"
+                  onClick={() => setIsAiGenerateOpen(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Generate with AI
+                </button>
+              )}
               <button
                 type="button"
                 onClick={handleClose}
@@ -218,7 +254,7 @@ export default function CreateEditProductModal({
                   <input
                     type="text"
                     {...register("productName", { required: true })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.productName ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -228,7 +264,7 @@ export default function CreateEditProductModal({
                   <input
                     type="text"
                     {...register("destination", { required: true })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.destination ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -238,7 +274,7 @@ export default function CreateEditProductModal({
                   <input
                     type="text"
                     {...register("category", { required: true })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.category ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -248,7 +284,7 @@ export default function CreateEditProductModal({
                   <textarea
                     {...register("description", { required: true })}
                     rows={3}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                    className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 resize-none ${errors.description ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                   />
                 </div>
               </div>
@@ -284,7 +320,7 @@ export default function CreateEditProductModal({
                           }
                         },
                       })}
-                      className="w-full pl-12 pr-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className={`w-full pl-12 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.price ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                     />
                   </div>
                 </div>
@@ -299,7 +335,7 @@ export default function CreateEditProductModal({
                       min: 0,
                       valueAsNumber: true,
                     })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.inventoryCount ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                   />
                 </div>
               </div>
@@ -324,7 +360,7 @@ export default function CreateEditProductModal({
                         dateFormat="dd-MM-yyyy"
                         placeholderText="DD-MM-YYYY"
                         strictParsing={true}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.validFrom ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                         wrapperClassName="w-full"
                       />
                     )}
@@ -345,7 +381,7 @@ export default function CreateEditProductModal({
                         dateFormat="dd-MM-yyyy"
                         placeholderText="DD-MM-YYYY"
                         strictParsing={true}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.validUntil ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
                         wrapperClassName="w-full"
                       />
                     )}
@@ -432,10 +468,8 @@ export default function CreateEditProductModal({
           "List a Luxury Spa Retreat in Nuwara Eliya categorized as Wellness, priced at 15000 LKR.",
           "Create a VIP Airport Transfer to Ella for 8500 LKR with 5 available bookings.",
         ]}
-        onSubmit={(query) => {
-          console.log("Generating with AI query:", query);
-          setIsAiGenerateOpen(false);
-        }}
+        onSubmit={handleAiGenerate}
+        isLoading={isAiGenerating}
         discardTitle="Discard prompt?"
         discardDescription="You have entered a product prompt. Are you sure you want to discard it?"
       />

@@ -158,3 +158,32 @@ export const aiSearchProducts = async (
   }
   return response.json();
 };
+
+export const aiGenerateProduct = async (
+  prompt: string,
+): Promise<{
+  productName: string;
+  destination: string;
+  category: string;
+  description: string;
+  price: number;
+  inventoryCount: number;
+  validFrom: string;
+  validUntil: string;
+  status: string;
+}> => {
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/ai-generate`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    },
+  );
+  if (!response.ok) {
+    throw new Error("Failed to generate product via AI");
+  }
+  return response.json();
+};

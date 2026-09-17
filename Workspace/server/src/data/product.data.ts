@@ -46,7 +46,7 @@ export const getProducts = async (
 
   const where: Prisma.ProductWhereInput = {
     validUntil: {
-      gte: new Date(),
+      gte: new Date(), // will always return valid products (that haven't expired)
     },
   };
 
