@@ -1,32 +1,63 @@
-# React + TypeScript + Vite
+# AI Travel Manager Web App - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## 1. Description
 
-Currently, two official plugins are available:
+This is the frontend portion of the AI Travel Manager Web App. It is a React.js application created with Vite, using TypeScript and Tailwind CSS for styling. It handles user interaction, state management, and communication with the backend API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 2. Prerequisites
 
-## React Compiler
+- [Node.js](https://nodejs.org/) (v20 or higher recommended)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 3. Installation
 
-## Expanding the Oxlint configuration
+Navigate to the `client` directory and install the dependencies:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+cd Workspace/client
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Set up your environment variables by copying the example file:
+
+```bash
+cp .env.example .env
+```
+
+### Start the Application
+
+Once dependencies are installed and the backend server is running, start the development server:
+
+```bash
+npm run dev
+```
+
+## 4. Available Scripts
+
+In the project directory, you can run:
+
+### `npm run dev`
+Runs the app in development mode using Vite. Open [http://localhost:5173](http://localhost:5173) to view it in your browser. The page will reload when you make changes.
+
+### `npm run build`
+Builds the app for production to the `dist` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
+
+### `npm run lint`
+Runs lint to check for code quality and syntax issues.
+
+### `npm run format`
+Runs Prettier to automatically format your code according to the `.prettierrc` configuration.
+
+### `npm run preview`
+Locally preview the production build after running `npm run build`.
+
+## 5. Source Code Structure
+
+The `src` directory contains the core frontend application code, structured as follows:
+
+- **`main.tsx`**: The main entry point of the React application that renders `App.tsx` into the DOM.
+- **`App.tsx`**: The main React component that acts as the root of the application, managing layouts and rendering other components.
+- **`global.css`**: The global CSS file where Tailwind CSS directives and custom global styles are imported.
+- **`constants.ts`**: Contains constants used across the application.
+- **`components/`**: Contains reusable React UI components that make up the different parts of the application.
+- **`services/`**: Contains API service functions for communicating with the backend server.
+- **`types/`**: Contains TypeScript type definitions and interfaces used throughout the application to ensure type safety.
