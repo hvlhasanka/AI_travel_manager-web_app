@@ -8,6 +8,7 @@ import {
 import openai from "../config/openai";
 import cloudinary from "../config/cloudinary";
 import ExcelJS from "exceljs";
+import PDFDocument from "pdfkit-table";
 
 export const createProductHandler = async (req: Request, res: Response) => {
   try {
@@ -277,7 +278,8 @@ export const exportProductsHandler = async (req: Request, res: Response) => {
 
     worksheet.columns = [
       { header: "Product ID", key: "productId", width: 15 },
-      { header: "Product", key: "productName", width: 30 },
+      { header: "Product Image URL", key: "imageUrl", width: 40 },
+      { header: "Product Name", key: "productName", width: 30 },
       { header: "Destination", key: "destination", width: 20 },
       { header: "Description", key: "description", width: 50 },
       { header: "Category", key: "category", width: 20 },
@@ -286,8 +288,8 @@ export const exportProductsHandler = async (req: Request, res: Response) => {
       { header: "Valid From", key: "validFrom", width: 20 },
       { header: "Valid Until", key: "validUntil", width: 20 },
       { header: "Status", key: "status", width: 15 },
-      { header: "Created On", key: "createdAt", width: 20 },
-      { header: "Last Updated On", key: "updatedAt", width: 20 },
+      { header: "Created At", key: "createdAt", width: 20 },
+      { header: "Last Updated At", key: "updatedAt", width: 20 },
     ];
 
     // Header Row Styling
@@ -301,6 +303,7 @@ export const exportProductsHandler = async (req: Request, res: Response) => {
     products.forEach((product) => {
       worksheet.addRow({
         ...product,
+        imageUrl: product.imageUrl || "N/A",
         validFrom: product.validFrom.toISOString().split("T")[0],
         validUntil: product.validUntil.toISOString().split("T")[0],
         createdAt: product.createdAt
@@ -327,6 +330,179 @@ export const exportProductsHandler = async (req: Request, res: Response) => {
     res.end();
   } catch (error) {
     console.error("Error exporting products:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const exportProductsPdfHandler = async (req: Request, res: Response) => {
+  try {
+    const {
+      productIds,
+      searchValue,
+      destination,
+      category,
+      minPrice,
+      maxPrice,
+      status,
+    } = req.body;
+
+    const filters = {
+      destination,
+      category,
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      status,
+    };
+
+    const products = await productData.getProductsForExport(
+      productIds,
+      searchValue,
+      filters,
+    );
+
+    const doc = new PDFDocument({ margin: 40, size: "A4" });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=products_export.pdf",
+    );
+    doc.pipe(res);
+
+    doc
+      .fontSize(20)
+      .font("Helvetica-Bold")
+      .text("Products Export", { align: "center" });
+    doc.moveDown(2);
+
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+      // Create a new page if the current page is about to end
+      if (doc.y > 600) {
+        doc.addPage();
+      }
+
+      // Card Title
+      doc
+        .fontSize(14)
+        .font("Helvetica-Bold")
+        .text(product.productName, 40, doc.y);
+      doc.moveDown(0.5);
+
+      const yAfterTitle = doc.y;
+
+      // First column (Image)
+      const col1X = 40;
+      if (product.imageUrl) {
+        try {
+          const response = await fetch(product.imageUrl);
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+
+          doc.image(buffer, col1X, yAfterTitle, { width: 100 });
+        } catch (imgError) {
+          console.error("Failed to load image for PDF", imgError);
+          doc
+            .font("Helvetica")
+            .fillColor("red")
+            .text("Failed to load image", col1X, yAfterTitle);
+          doc.fillColor("black");
+        }
+      } else {
+        doc.font("Helvetica").text("No Image", col1X, yAfterTitle);
+      }
+
+      // Second column
+      const col2X = 160;
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .text("Product ID:", col2X, yAfterTitle);
+      doc.font("Helvetica").text(product.productId, col2X + 80, yAfterTitle);
+
+      doc.font("Helvetica-Bold").text("Destination:", col2X, yAfterTitle + 15);
+      doc
+        .font("Helvetica")
+        .text(product.destination, col2X + 80, yAfterTitle + 15);
+
+      doc.font("Helvetica-Bold").text("Category:", col2X, yAfterTitle + 30);
+      doc
+        .font("Helvetica")
+        .text(product.category, col2X + 80, yAfterTitle + 30);
+
+      doc.font("Helvetica-Bold").text("Price:", col2X, yAfterTitle + 45);
+      doc
+        .font("Helvetica")
+        .text(product.price.toString(), col2X + 80, yAfterTitle + 45);
+
+      doc.font("Helvetica-Bold").text("Inventory:", col2X, yAfterTitle + 60);
+      doc
+        .font("Helvetica")
+        .text(product.inventoryCount.toString(), col2X + 80, yAfterTitle + 60);
+
+      // Third column
+      const col3X = 360;
+      doc.font("Helvetica-Bold").text("Status:", col3X, yAfterTitle);
+      doc.font("Helvetica").text(product.status, col3X + 70, yAfterTitle);
+
+      doc.font("Helvetica-Bold").text("Valid From:", col3X, yAfterTitle + 15);
+      doc
+        .font("Helvetica")
+        .text(
+          product.validFrom.toISOString().split("T")[0],
+          col3X + 70,
+          yAfterTitle + 15,
+        );
+
+      doc.font("Helvetica-Bold").text("Valid Until:", col3X, yAfterTitle + 30);
+      doc
+        .font("Helvetica")
+        .text(
+          product.validUntil.toISOString().split("T")[0],
+          col3X + 70,
+          yAfterTitle + 30,
+        );
+
+      doc.font("Helvetica-Bold").text("Created At:", col3X, yAfterTitle + 45);
+      doc
+        .font("Helvetica")
+        .text(
+          product.createdAt.toISOString().replace("T", " ").substring(0, 19),
+          col3X + 70,
+          yAfterTitle + 45,
+        );
+
+      doc.font("Helvetica-Bold").text("Updated At:", col3X, yAfterTitle + 60);
+      doc
+        .font("Helvetica")
+        .text(
+          product.updatedAt.toISOString().replace("T", " ").substring(0, 19),
+          col3X + 70,
+          yAfterTitle + 60,
+        );
+
+      // Bottom Row (Description)
+      doc.y = yAfterTitle + 115;
+
+      doc.font("Helvetica-Bold").text("Description:", 40, doc.y);
+      doc
+        .font("Helvetica")
+        .text(product.description || "N/A", 40, doc.y, { width: 515 });
+
+      // Divider
+      doc.moveDown(1);
+      doc
+        .strokeColor("#cccccc")
+        .lineWidth(1)
+        .moveTo(40, doc.y)
+        .lineTo(555, doc.y)
+        .stroke();
+      doc.moveDown(1.5);
+    }
+
+    doc.end();
+  } catch (error) {
+    console.error("Error exporting products to PDF:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

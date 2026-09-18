@@ -11,6 +11,7 @@ import {
   Filter,
   Download,
   FileSpreadsheet,
+  FileText,
   ChevronDown,
 } from "lucide-react";
 import { MAX_PRICE } from "../../constants";
@@ -22,6 +23,7 @@ import {
   deleteProduct,
   aiSearchProducts,
   exportProducts,
+  exportProductsPdf,
 } from "../../services/product.service";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import type { Product } from "../../types/product.types";
@@ -173,19 +175,29 @@ export default function ProductsSection() {
     }
   };
 
-  const handleExportClick = async (type: "selected" | "filtered") => {
+  const handleExportClick = async (
+    type: "selected" | "filtered",
+    format: "excel" | "pdf",
+  ) => {
     setIsExportDropdownOpen(false);
     try {
       const ids = type === "selected" ? selectedIds : [];
       const appliedFilters = type === "filtered" ? filters : null;
-      await exportProducts(ids, appliedFilters);
+      if (format === "excel") {
+        await exportProducts(ids, appliedFilters);
+      } else {
+        await exportProductsPdf(ids, appliedFilters);
+      }
       setBanner({
         type: "success",
-        message: "Products export ready to download",
+        message: `Products ${format.toUpperCase()} export ready to download`,
       });
     } catch (error) {
       console.error("Error:", error);
-      setBanner({ type: "error", message: "Failed to export products" });
+      setBanner({
+        type: "error",
+        message: `Failed to export products to ${format.toUpperCase()}`,
+      });
     }
   };
 
@@ -254,26 +266,48 @@ export default function ProductsSection() {
                 {isExportDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50 overflow-hidden">
                     {selectedCount > 0 && (
-                      <button
-                        onClick={() => handleExportClick("selected")}
-                        className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
-                      >
-                        <FileSpreadsheet className="w-5 h-5 text-green-600" />
-                        <span className="text-sm font-semibold text-slate-700">
-                          Excel (Selected Records)
-                        </span>
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleExportClick("selected", "excel")}
+                          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                        >
+                          <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                          <span className="text-sm font-semibold text-slate-700">
+                            Excel (Selected Rows)
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => handleExportClick("selected", "pdf")}
+                          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                        >
+                          <FileText className="w-5 h-5 text-red-600" />
+                          <span className="text-sm font-semibold text-slate-700">
+                            PDF (Selected Rows)
+                          </span>
+                        </button>
+                      </>
                     )}
                     {filters && (
-                      <button
-                        onClick={() => handleExportClick("filtered")}
-                        className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors ${selectedCount > 0 ? "border-t border-slate-100" : ""}`}
-                      >
-                        <FileSpreadsheet className="w-5 h-5 text-green-600" />
-                        <span className="text-sm font-semibold text-slate-700">
-                          Excel (Filter Results)
-                        </span>
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleExportClick("filtered", "excel")}
+                          className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors ${selectedCount > 0 ? "border-t border-slate-100" : ""}`}
+                        >
+                          <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                          <span className="text-sm font-semibold text-slate-700">
+                            Excel (Filter Results)
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => handleExportClick("filtered", "pdf")}
+                          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                        >
+                          <FileText className="w-5 h-5 text-red-600" />
+                          <span className="text-sm font-semibold text-slate-700">
+                            PDF (Filter Results)
+                          </span>
+                        </button>
+                      </>
                     )}
                   </div>
                 )}

@@ -9,6 +9,7 @@ import {
   aiGenerateImageHandler,
   getProductStatsHandler,
   exportProductsHandler,
+  exportProductsPdfHandler,
 } from "../controllers/product.controller";
 import { validateRequest } from "../middleware/validateRequest";
 import {
@@ -36,5 +37,6 @@ router.delete(
   deleteProductHandler,
 );
 router.post("/export", exportProductsHandler);
+router.post("/export-pdf", exportProductsPdfHandler);
 
 export default router;
