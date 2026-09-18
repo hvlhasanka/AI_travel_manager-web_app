@@ -4,6 +4,7 @@ import {
   CreateProductInput,
   UpdateProductInput,
 } from "../schema/product.schema";
+import { deleteImageFromCloudinary } from "../utils/cloudinary";
 
 import { customAlphabet } from "nanoid";
 
@@ -26,6 +27,7 @@ export const createProduct = async (data: CreateProductInput) => {
       destination: data.destination,
       category: data.category,
       description: data.description,
+      imageUrl: data.imageUrl,
       price: data.price,
       inventoryCount: data.inventoryCount,
       validFrom,
@@ -105,9 +107,10 @@ export const updateProduct = async (
   productId: string,
   data: UpdateProductInput,
 ) => {
-  if (data.validFrom || data.validUntil) {
-    const existing = await prisma.product.findUnique({ where: { productId } });
-    if (existing) {
+  const existing = await prisma.product.findUnique({ where: { productId } });
+
+  if (existing) {
+    if (data.validFrom || data.validUntil) {
       const validFrom = data.validFrom
         ? new Date(data.validFrom)
         : existing.validFrom;
@@ -117,6 +120,14 @@ export const updateProduct = async (
       if (validUntil < validFrom) {
         throw new Error("validUntil date cannot be before validFrom date");
       }
+    }
+
+    if (
+      data.imageUrl !== undefined &&
+      existing.imageUrl &&
+      existing.imageUrl !== data.imageUrl
+    ) {
+      deleteImageFromCloudinary(existing.imageUrl).catch(console.error);
     }
   }
 
@@ -131,6 +142,17 @@ export const updateProduct = async (
 };
 
 export const deleteProducts = async (productIds: string[]) => {
+  const productsToDelete = await prisma.product.findMany({
+    where: { productId: { in: productIds } },
+    select: { imageUrl: true },
+  });
+
+  productsToDelete.forEach((product) => {
+    if (product.imageUrl) {
+      deleteImageFromCloudinary(product.imageUrl).catch(console.error);
+    }
+  });
+
   return await prisma.product.deleteMany({
     where: { productId: { in: productIds } },
   });

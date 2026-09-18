@@ -36,18 +36,23 @@ npm run dev
 In the project directory, you can run:
 
 ### `npm run dev`
+
 Runs the app in development mode using Vite. Open [http://localhost:5173](http://localhost:5173) to view it in your browser. The page will reload when you make changes.
 
 ### `npm run build`
+
 Builds the app for production to the `dist` folder. It correctly bundles React in production mode and optimizes the build for the best performance.
 
 ### `npm run lint`
+
 Runs lint to check for code quality and syntax issues.
 
 ### `npm run format`
+
 Runs Prettier to automatically format your code according to the `.prettierrc` configuration.
 
 ### `npm run preview`
+
 Locally preview the production build after running `npm run build`.
 
 ## 5. Source Code Structure

@@ -6,6 +6,7 @@ import {
   aiGenerateProductSchema,
 } from "../schema/product.schema";
 import openai from "../config/openai";
+import cloudinary from "../config/cloudinary";
 
 export const createProductHandler = async (req: Request, res: Response) => {
   try {
@@ -200,6 +201,47 @@ export const getProductStatsHandler = async (req: Request, res: Response) => {
     res.status(200).json(stats);
   } catch (error) {
     console.error("Error fetching product stats:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const aiGenerateImageHandler = async (req: Request, res: Response) => {
+  try {
+    const { productName, description, destination, category } = req.body;
+    if (!productName || !description || !destination || !category) {
+      return res.status(400).json({
+        error:
+          "Product name, description, destination, and category are required to generate an image",
+      });
+    }
+
+    const prompt = `A high quality travel product image for "${productName}". Category: ${category}. Destination: ${destination}. Description: ${description}. No text or words in the image.`;
+
+    const aiResponse = await openai.images.generate({
+      model: "gpt-image-1-mini",
+      prompt,
+      n: 1,
+      size: "1024x1024",
+      quality: "low",
+    });
+
+    const imageObject = aiResponse.data?.[0];
+    const uploadSource = `data:image/png;base64,${imageObject?.b64_json}`;
+
+    if (!uploadSource) {
+      return res
+        .status(500)
+        .json({ error: "Failed to extract image data from AI response" });
+    }
+
+    const uploadResponse = await cloudinary.uploader.upload(uploadSource, {
+      folder: "AI Travel Manager/Products",
+    });
+    console.log(uploadResponse);
+
+    res.status(200).json({ imageUrl: uploadResponse.secure_url });
+  } catch (error) {
+    console.error("Error in AI generate image:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

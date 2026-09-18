@@ -8,9 +8,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../../services/product.service";
 import type { Product } from "../../types/product.types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { FilterFormValues } from "./ProductFilter";
+import FullscreenImageOverlay from "./FullscreenImageOverlay";
 
 const features = tableFeatures({ rowSelectionFeature });
 const helper = createColumnHelper<typeof features, Product>();
@@ -36,15 +37,33 @@ const columns = helper.columns([
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (info.table.options.meta as any)?.highlightedProductId ===
         info.getValue();
+      const hasImage = !!info.row.original.imageUrl;
       return (
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500">
-            {info.getValue().slice(-6).toUpperCase()}
-          </span>
-          {isNew && (
-            <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-orange-600 bg-orange-100 rounded-md">
-              NEW
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500">
+              {info.getValue().slice(-6).toUpperCase()}
             </span>
+            {isNew && (
+              <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-orange-600 bg-orange-100 rounded-md">
+                NEW
+              </span>
+            )}
+          </div>
+          {hasImage && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (info.table.options.meta as any)?.onImageClick?.(
+                  info.row.original.imageUrl,
+                );
+              }}
+              className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
+              title="View Image"
+            >
+              <ImageIcon className="w-3.5 h-3.5" />
+            </button>
           )}
         </div>
       );
@@ -63,8 +82,11 @@ const columns = helper.columns([
   helper.accessor("description", {
     header: "Description",
     cell: (info) => (
-      <div className="w-[150px] min-w-[150px] truncate" title={info.getValue()}>
-        {info.getValue()}
+      <div className="group/desc relative flex items-center h-full w-[150px] min-w-[150px]">
+        <div className="truncate w-full cursor-pointer">{info.getValue()}</div>
+        <div className="absolute left-0 top-full mt-1 hidden w-72 p-4 bg-white text-slate-700 text-sm rounded-lg shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-100 z-[100] group-hover/desc:block whitespace-normal break-words leading-relaxed pointer-events-none transition-all duration-200">
+          {info.getValue()}
+        </div>
       </div>
     ),
   }),
@@ -136,6 +158,9 @@ export default function ProductsTable({
 }) {
   const [page, setPage] = useState(1);
   const [prevFilters, setPrevFilters] = useState(filters);
+  const [fullscreenImageUrl, setFullscreenImageUrl] = useState<string | null>(
+    null,
+  );
   const limit = 10;
 
   if (filters !== prevFilters) {
@@ -177,6 +202,7 @@ export default function ProductsTable({
     enableRowSelection: true,
     meta: {
       highlightedProductId,
+      onImageClick: (url: string) => setFullscreenImageUrl(url),
     },
   });
 
@@ -357,6 +383,13 @@ export default function ProductsTable({
             </button>
           </div>
         </div>
+      )}
+
+      {fullscreenImageUrl && (
+        <FullscreenImageOverlay
+          imageUrl={fullscreenImageUrl}
+          onClose={() => setFullscreenImageUrl(null)}
+        />
       )}
     </div>
   );

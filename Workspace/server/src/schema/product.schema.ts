@@ -5,6 +5,7 @@ export const productSchema = z.object({
   destination: z.string().min(1, "Destination is required"),
   category: z.string().min(1, "Category is required"),
   description: z.string().min(1, "Description is required"),
+  imageUrl: z.string().url().nullable().optional(),
   price: z.number().positive("Price must be positive"),
   inventoryCount: z.number().int().nonnegative().default(0),
   validFrom: z.string().datetime("validFrom must be a valid ISO datetime"),

@@ -187,3 +187,26 @@ export const aiGenerateProduct = async (
   }
   return response.json();
 };
+
+export const aiGenerateImage = async (data: {
+  productName: string;
+  description: string;
+  destination: string;
+  category: string;
+}): Promise<{ imageUrl: string }> => {
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/ai-generate-image`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    },
+  );
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error || "Failed to generate image via AI");
+  }
+  return response.json();
+};
