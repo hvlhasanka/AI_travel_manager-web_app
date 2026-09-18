@@ -227,13 +227,16 @@ export const exportProducts = async (
           status: filters?.status,
         };
 
-  const response = await fetch(`${API_URL}/travel-manager/v1/product/export`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/export-excel`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   if (!response.ok) {
     throw new Error("Failed to export products");

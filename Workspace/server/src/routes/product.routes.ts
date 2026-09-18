@@ -36,7 +36,7 @@ router.delete(
   validateRequest(deleteProductSchema),
   deleteProductHandler,
 );
-router.post("/export", exportProductsHandler);
+router.post("/export-excel", exportProductsHandler);
 router.post("/export-pdf", exportProductsPdfHandler);
 
 export default router;
