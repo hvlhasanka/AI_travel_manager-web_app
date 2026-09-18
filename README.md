@@ -47,26 +47,22 @@ Copy the env examples and fill in real values:
 cp .env.example .env
 ```
 
-Start the PostgreSQL database (via Docker Compose):
+Start the PostgreSQL database and API server (via Docker Compose):
 
 ```bash
 cd Workspace/server
-docker compose up db -d
+docker-compose up -d
 ```
 
-*(To stop the database, `docker compose down`)*
+*(To stop them, `docker-compose down`)*
 
-Push the database schema:
+Push the database schema to the running database:
 
 ```bash
 npx prisma db push
 ```
 
-Start the API Server:
-
-```bash
-npm run dev
-```
+*(Alternatively, to run only the database in Docker and the server locally, you can use `docker-compose up db -d` and `npm run dev` in the server directory).*
 
 Run the Client Web App:
 

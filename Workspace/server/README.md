@@ -26,15 +26,15 @@ cp .env.example .env
 
 *(Make sure to fill in your `OPENAI_API_KEY` to enable AI features).*
 
-### Database Setup (Docker Alternative)
+### Running with Docker
 
-To run PostgreSQL locally for development, make sure you have Docker installed and run:
+You can run both the API server and the PostgreSQL database together using Docker Compose. Make sure you have Docker installed.
+
+To build and start both the server and database containers in the background, run:
 
 ```bash
-docker compose up db -d
+docker-compose up -d
 ```
-
-This will start a PostgreSQL container in the background.
 
 Since the database is empty on the first run, push your Prisma schema to create the tables:
 
@@ -42,19 +42,28 @@ Since the database is empty on the first run, push your Prisma schema to create 
 npx prisma db push
 ```
 
-To stop the database, run:
+To stop both the server and the database, run:
 
 ```bash
-docker compose down
+docker-compose down
 ```
 
-### Start the Server
+### Local Development (Without Docker for Server)
 
-Once the database is ready, you can start the API server:
+If you prefer to run the API server locally while using Docker only for the database:
 
-```bash
-npm run dev
-```
+1. Start only the database:
+   ```bash
+   docker-compose up db -d
+   ```
+2. Push your Prisma schema to create the tables:
+   ```bash
+   npx prisma db push
+   ```
+3. Start the API server:
+   ```bash
+   npm run dev
+   ```
 
 ## 4. Available Scripts
 
