@@ -222,8 +222,6 @@ export default function CreateEditProductModal({
   };
 
   const onSubmit = (data: CreateEditProductModalData) => {
-    console.log("Saving Product:", data);
-
     const payload = {
       ...data,
       imageUrl: data.imageUrl || null,

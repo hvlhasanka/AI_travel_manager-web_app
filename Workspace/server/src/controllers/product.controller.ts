@@ -237,7 +237,6 @@ export const aiGenerateImageHandler = async (req: Request, res: Response) => {
     const uploadResponse = await cloudinary.uploader.upload(uploadSource, {
       folder: "AI Travel Manager/Products",
     });
-    console.log(uploadResponse);
 
     res.status(200).json({ imageUrl: uploadResponse.secure_url });
   } catch (error) {
