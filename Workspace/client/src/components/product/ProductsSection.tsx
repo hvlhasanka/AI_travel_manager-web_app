@@ -1,10 +1,14 @@
 import ProductsTable from "./ProductsTable";
+import { columns as tableColumns } from "./productsTableColumns";
 import CreateEditProductModal from "./CreateEditProductModal";
 import ViewProductModal from "./ViewProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
 import ExportDropdown from "./ExportDropdown";
 import ExportLoadingOverlay from "./ExportLoadingOverlay";
+import ColumnVisibilityDropdown, {
+  type ColumnOption,
+} from "./ColumnVisibilityDropdown";
 import {
   Plus,
   Sparkles,
@@ -13,9 +17,10 @@ import {
   Filter,
   Download,
   ChevronDown,
+  Columns,
 } from "lucide-react";
 import { MAX_PRICE } from "../../constants";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Banner from "../Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -32,7 +37,37 @@ export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
+  const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
+  const [columnVisibility, setColumnVisibility] = useState<
+    Record<string, boolean>
+  >({});
+
   const exportDropdownRef = useRef<HTMLDivElement>(null);
+  const columnDropdownRef = useRef<HTMLDivElement>(null);
+
+  const columnOptions = useMemo<ColumnOption[]>(() => {
+    const opts = tableColumns
+      .filter((col) => col.id !== "emptyStart")
+      .map((col) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const id = (col.id || (col as any).accessorKey) as string;
+        const label = (col.header as string) || id;
+        if (id === "validUntil") {
+          return {
+            id,
+            label,
+            children: [
+              { id: "validFrom", label: "Valid From" },
+              { id: "validTo", label: "Valid Until" },
+            ],
+          };
+        }
+        return { id, label };
+      });
+
+    opts.splice(1, 0, { id: "imageUrl", label: "Image" });
+    return opts;
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -41,6 +76,12 @@ export default function ProductsSection() {
         !exportDropdownRef.current.contains(event.target as Node)
       ) {
         setIsExportDropdownOpen(false);
+      }
+      if (
+        columnDropdownRef.current &&
+        !columnDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsColumnDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -187,9 +228,9 @@ export default function ProductsSection() {
       const ids = type === "selected" ? selectedIds : [];
       const appliedFilters = type === "filtered" ? filters : null;
       if (format === "excel") {
-        await exportProducts(ids, appliedFilters);
+        await exportProducts(ids, appliedFilters, columnVisibility);
       } else {
-        await exportProductsPdf(ids, appliedFilters);
+        await exportProductsPdf(ids, appliedFilters, columnVisibility);
       }
       setBanner({
         type: "success",
@@ -311,6 +352,31 @@ export default function ProductsSection() {
                 className="w-full md:w-64 lg:w-70 xl:w-85 pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
               />
             </div>
+            <div className="relative" ref={columnDropdownRef}>
+              <button
+                onClick={() => setIsColumnDropdownOpen(!isColumnDropdownOpen)}
+                className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
+                  isColumnDropdownOpen
+                    ? "bg-orange-100 text-orange-600 border-orange-200"
+                    : "bg-white text-slate-600 border-slate-300 hover:text-orange-600 hover:border-orange-300 hover:bg-orange-50"
+                }`}
+                title="Toggle Columns"
+              >
+                <Columns className="w-5 h-5" />
+              </button>
+              {isColumnDropdownOpen && (
+                <ColumnVisibilityDropdown
+                  columns={columnOptions}
+                  visibility={columnVisibility}
+                  onToggle={(id) =>
+                    setColumnVisibility((prev) => ({
+                      ...prev,
+                      [id]: prev[id] === false ? true : false,
+                    }))
+                  }
+                />
+              )}
+            </div>
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
@@ -345,6 +411,7 @@ export default function ProductsSection() {
               setRowSelection={setRowSelection}
               onRowClick={handleRowClick}
               filters={filters}
+              columnVisibility={columnVisibility}
             />
           </div>
           {/* Filter Inner Container */}
@@ -431,7 +498,12 @@ export default function ProductsSection() {
         }}
         onExportPdf={async (product) => {
           try {
-            await exportProductsPdf([product.productId], null);
+            await exportProductsPdf(
+              [product.productId],
+              null,
+              undefined,
+              "single",
+            );
             setBanner({
               type: "success",
               message: "PDF document ready to download",

@@ -214,10 +214,11 @@ export const aiGenerateImage = async (data: {
 export const exportProducts = async (
   selectedIds: string[],
   filters?: FilterFormValues | null,
+  columnVisibility?: Record<string, boolean>,
 ): Promise<void> => {
   const payload =
     selectedIds.length > 0
-      ? { productIds: selectedIds }
+      ? { productIds: selectedIds, columnVisibility }
       : {
           searchValue: filters?.product,
           destination: filters?.destination,
@@ -225,6 +226,7 @@ export const exportProducts = async (
           minPrice: filters?.minPrice,
           maxPrice: filters?.maxPrice,
           status: filters?.status,
+          columnVisibility,
         };
 
   const response = await fetch(
@@ -256,10 +258,12 @@ export const exportProducts = async (
 export const exportProductsPdf = async (
   selectedIds: string[],
   filters?: FilterFormValues | null,
+  columnVisibility?: Record<string, boolean>,
+  layout: "single" | "grid" = "grid",
 ): Promise<void> => {
   const payload =
     selectedIds.length > 0
-      ? { productIds: selectedIds }
+      ? { productIds: selectedIds, columnVisibility, layout }
       : {
           searchValue: filters?.product,
           destination: filters?.destination,
@@ -267,6 +271,8 @@ export const exportProductsPdf = async (
           minPrice: filters?.minPrice,
           maxPrice: filters?.maxPrice,
           status: filters?.status,
+          columnVisibility,
+          layout,
         };
 
   const response = await fetch(
