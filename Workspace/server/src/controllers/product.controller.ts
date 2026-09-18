@@ -369,140 +369,194 @@ export const exportProductsPdfHandler = async (req: Request, res: Response) => {
     );
     doc.pipe(res);
 
-    doc
-      .fontSize(20)
-      .font("Helvetica-Bold")
-      .text("Products Export", { align: "center" });
-    doc.moveDown(2);
-
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
-      // Create a new page if the current page is about to end
-      if (doc.y > 600) {
-        doc.addPage();
-      }
+      if (i > 0) doc.addPage();
 
-      // Card Title
+      // Header
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .fillColor("#94a3b8")
+        .text(`Product ID: ${product.productId}`, 40, 40);
+      doc
+        .fontSize(10)
+        .font("Helvetica")
+        .fillColor("#94a3b8")
+        .text(`Generated on ${new Date().toLocaleDateString()}`, 40, 40, {
+          align: "right",
+        });
+
+      doc.moveDown(2);
+
+      // Title & Subtitle
+      doc
+        .fontSize(28)
+        .font("Helvetica-Bold")
+        .fillColor("#0f172a")
+        .text(product.productName, 40, doc.y);
+      doc.moveDown(0.2);
       doc
         .fontSize(14)
-        .font("Helvetica-Bold")
-        .text(product.productName, 40, doc.y);
-      doc.moveDown(0.5);
+        .font("Helvetica")
+        .fillColor("#64748b")
+        .text(
+          `${product.category.toUpperCase()} | ${product.destination}`,
+          40,
+          doc.y,
+        );
+      doc.moveDown(1.5);
 
-      const yAfterTitle = doc.y;
-
-      // First column (Image)
-      const col1X = 40;
+      // Image
       if (product.imageUrl) {
         try {
           const response = await fetch(product.imageUrl);
           const arrayBuffer = await response.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
 
-          doc.image(buffer, col1X, yAfterTitle, { width: 100 });
+          const imageStartY = doc.y;
+
+          doc.image(buffer, 40, imageStartY, {
+            fit: [515, 280],
+            align: "center",
+          });
+          doc.y = imageStartY + 300;
         } catch (imgError) {
           console.error("Failed to load image for PDF", imgError);
-          doc
-            .font("Helvetica")
-            .fillColor("red")
-            .text("Failed to load image", col1X, yAfterTitle);
-          doc.fillColor("black");
         }
-      } else {
-        doc.font("Helvetica").text("No Image", col1X, yAfterTitle);
       }
 
-      // Second column
-      const col2X = 160;
-      doc
-        .fontSize(10)
-        .font("Helvetica-Bold")
-        .text("Product ID:", col2X, yAfterTitle);
-      doc.font("Helvetica").text(product.productId, col2X + 80, yAfterTitle);
-
-      doc.font("Helvetica-Bold").text("Destination:", col2X, yAfterTitle + 15);
-      doc
-        .font("Helvetica")
-        .text(product.destination, col2X + 80, yAfterTitle + 15);
-
-      doc.font("Helvetica-Bold").text("Category:", col2X, yAfterTitle + 30);
-      doc
-        .font("Helvetica")
-        .text(product.category, col2X + 80, yAfterTitle + 30);
-
-      doc.font("Helvetica-Bold").text("Price:", col2X, yAfterTitle + 45);
-      doc
-        .font("Helvetica")
-        .text(product.price.toString(), col2X + 80, yAfterTitle + 45);
-
-      doc.font("Helvetica-Bold").text("Inventory:", col2X, yAfterTitle + 60);
-      doc
-        .font("Helvetica")
-        .text(product.inventoryCount.toString(), col2X + 80, yAfterTitle + 60);
-
-      // Third column
-      const col3X = 360;
-      doc.font("Helvetica-Bold").text("Status:", col3X, yAfterTitle);
-      doc.font("Helvetica").text(product.status, col3X + 70, yAfterTitle);
-
-      doc.font("Helvetica-Bold").text("Valid From:", col3X, yAfterTitle + 15);
-      doc
-        .font("Helvetica")
-        .text(
-          product.validFrom.toISOString().split("T")[0],
-          col3X + 70,
-          yAfterTitle + 15,
-        );
-
-      doc.font("Helvetica-Bold").text("Valid Until:", col3X, yAfterTitle + 30);
-      doc
-        .font("Helvetica")
-        .text(
-          product.validUntil.toISOString().split("T")[0],
-          col3X + 70,
-          yAfterTitle + 30,
-        );
-
-      doc.font("Helvetica-Bold").text("Created At:", col3X, yAfterTitle + 45);
-      doc
-        .font("Helvetica")
-        .text(
-          product.createdAt.toISOString().replace("T", " ").substring(0, 19),
-          col3X + 70,
-          yAfterTitle + 45,
-        );
-
-      doc.font("Helvetica-Bold").text("Updated At:", col3X, yAfterTitle + 60);
-      doc
-        .font("Helvetica")
-        .text(
-          product.updatedAt.toISOString().replace("T", " ").substring(0, 19),
-          col3X + 70,
-          yAfterTitle + 60,
-        );
-
-      // Bottom Row (Description)
-      doc.y = yAfterTitle + 115;
-
-      doc.font("Helvetica-Bold").text("Description:", 40, doc.y);
-      doc
-        .font("Helvetica")
-        .text(product.description || "N/A", 40, doc.y, { width: 515 });
-
       // Divider
-      doc.moveDown(1);
       doc
-        .strokeColor("#cccccc")
+        .strokeColor("#e2e8f0")
         .lineWidth(1)
         .moveTo(40, doc.y)
         .lineTo(555, doc.y)
         .stroke();
       doc.moveDown(1.5);
+
+      // Details Grid (3 columns)
+      const detailsY = doc.y;
+      const col1 = 40;
+      const col2 = 220;
+      const col3 = 400;
+
+      // Row 1
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#475569")
+        .text("Price", col1, detailsY);
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .fillColor("#0f172a")
+        .text(`LKR ${product.price}`, col1, detailsY + 15);
+
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#475569")
+        .text("Status", col2, detailsY);
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .fillColor(product.status === "ACTIVE" ? "#16a34a" : "#dc2626")
+        .text(product.status, col2, detailsY + 15);
+
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#475569")
+        .text("Inventory", col3, detailsY);
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .fillColor("#0f172a")
+        .text(product.inventoryCount.toString(), col3, detailsY + 15);
+
+      // Row 2
+      const row2Y = detailsY + 45;
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#475569")
+        .text("Valid From", col1, row2Y);
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .fillColor("#0f172a")
+        .text(product.validFrom.toISOString().split("T")[0], col1, row2Y + 15);
+
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor("#475569")
+        .text("Valid Until", col2, row2Y);
+      doc
+        .fontSize(12)
+        .font("Helvetica")
+        .fillColor("#0f172a")
+        .text(product.validUntil.toISOString().split("T")[0], col2, row2Y + 15);
+
+      doc.y = row2Y + 50;
+      doc.moveDown(1);
+      doc
+        .strokeColor("#e2e8f0")
+        .lineWidth(1)
+        .moveTo(40, doc.y)
+        .lineTo(555, doc.y)
+        .stroke();
+      doc.moveDown(1.5);
+
+      // Description
+      doc
+        .fontSize(14)
+        .font("Helvetica-Bold")
+        .fillColor("#0f172a")
+        .text("Description", 40, doc.y);
+      doc.moveDown(0.5);
+      doc
+        .fontSize(11)
+        .font("Helvetica")
+        .fillColor("#334155")
+        .text(product.description || "No description provided.", 40, doc.y, {
+          width: 515,
+          lineGap: 4,
+        });
+
+      // Footer
+      const formattedCreatedAt = product.createdAt
+        .toISOString()
+        .replace("T", " ")
+        .substring(0, 16);
+      const formattedUpdatedAt = product.updatedAt
+        .toISOString()
+        .replace("T", " ")
+        .substring(0, 16);
+
+      const footerY = 780;
+      doc
+        .fontSize(9)
+        .font("Helvetica")
+        .fillColor("#94a3b8")
+        .text(`Created At: ${formattedCreatedAt}`, 40, footerY, {
+          lineBreak: false,
+        });
+      doc
+        .fontSize(9)
+        .font("Helvetica")
+        .fillColor("#94a3b8")
+        .text(`Last Updated At: ${formattedUpdatedAt}`, 40, footerY, {
+          align: "right",
+          lineBreak: false,
+          width: 515,
+        });
     }
 
     doc.end();
   } catch (error) {
-    console.error("Error exporting products to PDF:", error);
+    console.error("Error exporting PDF:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

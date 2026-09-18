@@ -3,6 +3,8 @@ import CreateEditProductModal from "./CreateEditProductModal";
 import ViewProductModal from "./ViewProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
+import ExportDropdown from "./ExportDropdown";
+import ExportLoadingOverlay from "./ExportLoadingOverlay";
 import {
   Plus,
   Sparkles,
@@ -10,8 +12,6 @@ import {
   Trash2,
   Filter,
   Download,
-  FileSpreadsheet,
-  FileText,
   ChevronDown,
 } from "lucide-react";
 import { MAX_PRICE } from "../../constants";
@@ -175,11 +175,14 @@ export default function ProductsSection() {
     }
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
   const handleExportClick = async (
     type: "selected" | "filtered",
     format: "excel" | "pdf",
   ) => {
     setIsExportDropdownOpen(false);
+    setIsExporting(true);
     try {
       const ids = type === "selected" ? selectedIds : [];
       const appliedFilters = type === "filtered" ? filters : null;
@@ -190,19 +193,22 @@ export default function ProductsSection() {
       }
       setBanner({
         type: "success",
-        message: `Products ${format.toUpperCase()} export ready to download`,
+        message: `${format === "excel" ? "Excel" : "PDF"} document ready to download`,
       });
     } catch (error) {
       console.error("Error:", error);
       setBanner({
         type: "error",
-        message: `Failed to export products to ${format.toUpperCase()}`,
+        message: `Failed to export ${format === "excel" ? "Excel" : "PDF"} document`,
       });
+    } finally {
+      setIsExporting(false);
     }
   };
 
   return (
     <>
+      <ExportLoadingOverlay isOpen={isExporting} />
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
@@ -223,7 +229,7 @@ export default function ProductsSection() {
           key={banner.message}
           type={banner.type}
           message={banner.message}
-          duration={3000}
+          duration={5000}
           onClose={() => setBanner(null)}
         />
       )}
@@ -264,52 +270,11 @@ export default function ProductsSection() {
                 </button>
 
                 {isExportDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50 overflow-hidden">
-                    {selectedCount > 0 && (
-                      <>
-                        <button
-                          onClick={() => handleExportClick("selected", "excel")}
-                          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
-                        >
-                          <FileSpreadsheet className="w-5 h-5 text-green-600" />
-                          <span className="text-sm font-semibold text-slate-700">
-                            Excel (Selected Rows)
-                          </span>
-                        </button>
-                        <button
-                          onClick={() => handleExportClick("selected", "pdf")}
-                          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
-                        >
-                          <FileText className="w-5 h-5 text-red-600" />
-                          <span className="text-sm font-semibold text-slate-700">
-                            PDF (Selected Rows)
-                          </span>
-                        </button>
-                      </>
-                    )}
-                    {filters && (
-                      <>
-                        <button
-                          onClick={() => handleExportClick("filtered", "excel")}
-                          className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors ${selectedCount > 0 ? "border-t border-slate-100" : ""}`}
-                        >
-                          <FileSpreadsheet className="w-5 h-5 text-green-600" />
-                          <span className="text-sm font-semibold text-slate-700">
-                            Excel (Filter Results)
-                          </span>
-                        </button>
-                        <button
-                          onClick={() => handleExportClick("filtered", "pdf")}
-                          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
-                        >
-                          <FileText className="w-5 h-5 text-red-600" />
-                          <span className="text-sm font-semibold text-slate-700">
-                            PDF (Filter Results)
-                          </span>
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  <ExportDropdown
+                    selectedCount={selectedCount}
+                    hasFilters={!!filters}
+                    onExportClick={handleExportClick}
+                  />
                 )}
               </div>
             )}
@@ -463,6 +428,21 @@ export default function ProductsSection() {
           setRowSelection({ [product.productId]: true });
           setReturnToViewOnClose(true);
           setIsDeleteModalOpen(true);
+        }}
+        onExportPdf={async (product) => {
+          try {
+            await exportProductsPdf([product.productId], null);
+            setBanner({
+              type: "success",
+              message: "PDF document ready to download",
+            });
+          } catch (error) {
+            console.error("Error exporting PDF:", error);
+            setBanner({
+              type: "error",
+              message: "Failed to export product to PDF",
+            });
+          }
         }}
       />
     </>

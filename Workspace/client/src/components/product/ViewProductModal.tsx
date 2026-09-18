@@ -1,13 +1,15 @@
-import { X, Pencil, Trash2 } from "lucide-react";
+import { X, Pencil, Trash2, FileText } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "../../types/product.types";
 import FullscreenImageOverlay from "./FullscreenImageOverlay";
+import ExportLoadingOverlay from "./ExportLoadingOverlay";
 interface ViewProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null;
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onExportPdf: (product: Product) => Promise<void> | void;
 }
 
 export default function ViewProductModal({
@@ -16,13 +18,25 @@ export default function ViewProductModal({
   product,
   onEdit,
   onDelete,
+  onExportPdf,
 }: ViewProductModalProps) {
   const [isFullscreenImageOpen, setIsFullscreenImageOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   if (!isOpen || !product) return null;
 
+  const handleExportPdf = async () => {
+    setIsExporting(true);
+    try {
+      await onExportPdf(product);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <>
+      <ExportLoadingOverlay isOpen={isExporting} />
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6 transition-opacity duration-300"
         onClick={onClose}
@@ -200,10 +214,10 @@ export default function ViewProductModal({
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
               <button
                 onClick={() => onDelete(product)}
-                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 border border-slate-300 text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
+                className="flex items-center justify-center w-11 h-11 border border-slate-300 text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl transition-colors shadow-sm focus:outline-none cursor-pointer flex-shrink-0"
+                title="Delete Product"
               >
                 <Trash2 className="w-5 h-5" />
-                <span>Delete Product</span>
               </button>
               <button
                 onClick={() => onEdit(product)}
@@ -211,6 +225,13 @@ export default function ViewProductModal({
               >
                 <Pencil className="w-5 h-5" />
                 <span>Edit Details</span>
+              </button>
+              <button
+                onClick={handleExportPdf}
+                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
+              >
+                <FileText className="w-5 h-5" />
+                <span>Export to PDF</span>
               </button>
             </div>
           </div>
