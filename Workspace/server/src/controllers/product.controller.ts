@@ -7,6 +7,7 @@ import {
 } from "../schema/product.schema";
 import openai from "../config/openai";
 import cloudinary from "../config/cloudinary";
+import ExcelJS from "exceljs";
 
 export const createProductHandler = async (req: Request, res: Response) => {
   try {
@@ -241,6 +242,91 @@ export const aiGenerateImageHandler = async (req: Request, res: Response) => {
     res.status(200).json({ imageUrl: uploadResponse.secure_url });
   } catch (error) {
     console.error("Error in AI generate image:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const exportProductsHandler = async (req: Request, res: Response) => {
+  try {
+    const {
+      productIds,
+      searchValue,
+      destination,
+      category,
+      minPrice,
+      maxPrice,
+      status,
+    } = req.body;
+
+    const filters = {
+      destination,
+      category,
+      minPrice: minPrice ? parseFloat(minPrice) : undefined,
+      maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+      status,
+    };
+
+    const products = await productData.getProductsForExport(
+      productIds,
+      searchValue,
+      filters,
+    );
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Products");
+
+    worksheet.columns = [
+      { header: "Product ID", key: "productId", width: 15 },
+      { header: "Product", key: "productName", width: 30 },
+      { header: "Destination", key: "destination", width: 20 },
+      { header: "Description", key: "description", width: 50 },
+      { header: "Category", key: "category", width: 20 },
+      { header: "Price", key: "price", width: 15 },
+      { header: "Inventory Count", key: "inventoryCount", width: 15 },
+      { header: "Valid From", key: "validFrom", width: 20 },
+      { header: "Valid Until", key: "validUntil", width: 20 },
+      { header: "Status", key: "status", width: 15 },
+      { header: "Created On", key: "createdAt", width: 20 },
+      { header: "Last Updated On", key: "updatedAt", width: 20 },
+    ];
+
+    // Header Row Styling
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFE0E0E0" },
+    };
+
+    products.forEach((product) => {
+      worksheet.addRow({
+        ...product,
+        validFrom: product.validFrom.toISOString().split("T")[0],
+        validUntil: product.validUntil.toISOString().split("T")[0],
+        createdAt: product.createdAt
+          .toISOString()
+          .replace("T", " ")
+          .substring(0, 19),
+        updatedAt: product.updatedAt
+          .toISOString()
+          .replace("T", " ")
+          .substring(0, 19),
+      });
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=products_export.xlsx",
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Error exporting products:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

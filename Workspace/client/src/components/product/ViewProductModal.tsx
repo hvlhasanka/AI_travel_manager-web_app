@@ -171,21 +171,48 @@ export default function ViewProductModal({
           </div>
 
           {/* Footer */}
-          <div className="p-6 sm:px-8 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-end bg-white mt-auto">
-            <button
-              onClick={() => onDelete(product)}
-              className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 border border-slate-300 text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
-            >
-              <Trash2 className="w-5 h-5" />
-              <span>Delete Product</span>
-            </button>
-            <button
-              onClick={() => onEdit(product)}
-              className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
-            >
-              <Pencil className="w-5 h-5" />
-              <span>Edit Details</span>
-            </button>
+          <div className="p-6 sm:px-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white mt-auto">
+            <div className="flex flex-col text-xs text-slate-400 w-full sm:w-auto text-center sm:text-left order-2 sm:order-1">
+              {product.createdAt && (
+                <p>
+                  <span className="font-semibold">Created:</span>{" "}
+                  {new Date(product.createdAt).toLocaleDateString()}{" "}
+                  {new Date(product.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
+                </p>
+              )}
+              {product.updatedAt && (
+                <p>
+                  <span className="font-semibold">Last Updated:</span>{" "}
+                  {new Date(product.updatedAt).toLocaleDateString()}{" "}
+                  {new Date(product.updatedAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  })}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
+              <button
+                onClick={() => onDelete(product)}
+                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 border border-slate-300 text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
+              >
+                <Trash2 className="w-5 h-5" />
+                <span>Delete Product</span>
+              </button>
+              <button
+                onClick={() => onEdit(product)}
+                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
+              >
+                <Pencil className="w-5 h-5" />
+                <span>Edit Details</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

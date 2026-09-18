@@ -8,6 +8,7 @@ import {
   aiGenerateProductHandler,
   aiGenerateImageHandler,
   getProductStatsHandler,
+  exportProductsHandler,
 } from "../controllers/product.controller";
 import { validateRequest } from "../middleware/validateRequest";
 import {
@@ -34,5 +35,6 @@ router.delete(
   validateRequest(deleteProductSchema),
   deleteProductHandler,
 );
+router.post("/export", exportProductsHandler);
 
 export default router;

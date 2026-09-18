@@ -210,3 +210,42 @@ export const aiGenerateImage = async (data: {
   }
   return response.json();
 };
+
+export const exportProducts = async (
+  selectedIds: string[],
+  filters?: FilterFormValues | null,
+): Promise<void> => {
+  const payload =
+    selectedIds.length > 0
+      ? { productIds: selectedIds }
+      : {
+          searchValue: filters?.product,
+          destination: filters?.destination,
+          category: filters?.category,
+          minPrice: filters?.minPrice,
+          maxPrice: filters?.maxPrice,
+          status: filters?.status,
+        };
+
+  const response = await fetch(`${API_URL}/travel-manager/v1/product/export`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to export products");
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "products_export.xlsx");
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};

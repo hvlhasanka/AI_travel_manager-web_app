@@ -193,3 +193,52 @@ export const getProductStats = async () => {
     expiredCount,
   };
 };
+
+export const getProductsForExport = async (
+  productIds?: string[],
+  searchValue?: string,
+  filters?: ProductFilters,
+) => {
+  const where: Prisma.ProductWhereInput = {};
+
+  if (productIds && productIds.length > 0) {
+    where.productId = { in: productIds };
+  } else {
+    // If no specific IDs are passed, use the filter arguments
+    where.validUntil = {
+      gte: new Date(),
+    };
+
+    if (searchValue) {
+      where.productName = {
+        contains: searchValue,
+        mode: "insensitive",
+      };
+    }
+    if (filters?.destination) {
+      where.destination = {
+        contains: filters.destination,
+        mode: "insensitive",
+      };
+    }
+    if (filters?.category) {
+      where.category = {
+        contains: filters.category,
+        mode: "insensitive",
+      };
+    }
+    if (filters?.status && filters.status !== "ALL") {
+      where.status = filters.status;
+    }
+    if (filters?.minPrice != null || filters?.maxPrice != null) {
+      where.price = {};
+      if (filters.minPrice != null) where.price.gte = filters.minPrice;
+      if (filters.maxPrice != null) where.price.lte = filters.maxPrice;
+    }
+  }
+
+  return await prisma.product.findMany({
+    where,
+    orderBy: { createdAt: "desc" },
+  });
+};

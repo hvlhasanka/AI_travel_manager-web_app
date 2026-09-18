@@ -3,15 +3,25 @@ import CreateEditProductModal from "./CreateEditProductModal";
 import ViewProductModal from "./ViewProductModal";
 import AiOverlay from "./AiOverlay";
 import ProductFilter, { type FilterFormValues } from "./ProductFilter";
-import { Plus, Sparkles, Pencil, Trash2, Filter } from "lucide-react";
+import {
+  Plus,
+  Sparkles,
+  Pencil,
+  Trash2,
+  Filter,
+  Download,
+  FileSpreadsheet,
+  ChevronDown,
+} from "lucide-react";
 import { MAX_PRICE } from "../../constants";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Banner from "../Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   deleteProduct,
   aiSearchProducts,
+  exportProducts,
 } from "../../services/product.service";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import type { Product } from "../../types/product.types";
@@ -19,6 +29,22 @@ import type { Product } from "../../types/product.types";
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
+  const exportDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        exportDropdownRef.current &&
+        !exportDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsExportDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
@@ -147,6 +173,22 @@ export default function ProductsSection() {
     }
   };
 
+  const handleExportClick = async (type: "selected" | "filtered") => {
+    setIsExportDropdownOpen(false);
+    try {
+      const ids = type === "selected" ? selectedIds : [];
+      const appliedFilters = type === "filtered" ? filters : null;
+      await exportProducts(ids, appliedFilters);
+      setBanner({
+        type: "success",
+        message: "Products export ready to download",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      setBanner({ type: "error", message: "Failed to export products" });
+    }
+  };
+
   return (
     <>
       <DeleteConfirmModal
@@ -188,11 +230,56 @@ export default function ProductsSection() {
           </div>
 
           <div className="flex items-center gap-3 w-full md:w-auto">
-            {selectedCount > 1 && (
+            {selectedCount > 0 && (
               <div className="flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-sm font-semibold text-slate-600">
-                {selectedCount} items selected
+                {selectedCount} {selectedCount === 1 ? "item" : "items"}{" "}
+                selected
               </div>
             )}
+
+            {(selectedCount > 0 || filters) && (
+              <div className="relative" ref={exportDropdownRef}>
+                <button
+                  onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
+                  className="flex-shrink-0 flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-full text-slate-600 hover:text-green-600 hover:border-green-600 hover:bg-green-50 transition-colors cursor-pointer font-semibold text-sm"
+                  title="Export Data"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${isExportDropdownOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {isExportDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50 overflow-hidden">
+                    {selectedCount > 0 && (
+                      <button
+                        onClick={() => handleExportClick("selected")}
+                        className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                      >
+                        <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                        <span className="text-sm font-semibold text-slate-700">
+                          Excel (Selected Records)
+                        </span>
+                      </button>
+                    )}
+                    {filters && (
+                      <button
+                        onClick={() => handleExportClick("filtered")}
+                        className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors ${selectedCount > 0 ? "border-t border-slate-100" : ""}`}
+                      >
+                        <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                        <span className="text-sm font-semibold text-slate-700">
+                          Excel (Filter Results)
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {selectedCount === 1 && (
               <button
                 onClick={handleEdit}
@@ -212,6 +299,7 @@ export default function ProductsSection() {
                 <Trash2 className="w-5 h-5" />
               </button>
             )}
+
             <div className="relative w-full md:w-auto">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Sparkles className="h-5 w-5 text-orange-500" />
@@ -220,8 +308,8 @@ export default function ProductsSection() {
                 type="text"
                 readOnly
                 onClick={() => setIsAiSearchOpen(true)}
-                placeholder="Search any product in your own words ..."
-                className="w-full md:w-80 lg:w-96 xl:w-[32rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                placeholder="Search any product in your own words..."
+                className="w-full md:w-64 lg:w-70 xl:w-85 pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
               />
             </div>
             <button
