@@ -86,7 +86,7 @@ export default function ProductsTable({
 
   return (
     <div className="w-full flex flex-col h-full">
-      <div className="w-full overflow-x-auto flex-1">
+      <div className="w-full overflow-x-auto flex-1 max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -227,7 +227,7 @@ export default function ProductsTable({
       </div>
 
       {!showSkeleton && !isError && totalCount > 0 && (
-        <div className="flex items-center justify-between px-4 py-4 border-t border-slate-100 mt-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-4 border-t border-slate-100 mt-auto text-center sm:text-left">
           <div className="text-sm text-slate-500">
             Showing{" "}
             <span className="font-semibold text-slate-700">

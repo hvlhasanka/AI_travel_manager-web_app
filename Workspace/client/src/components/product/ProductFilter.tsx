@@ -57,6 +57,7 @@ export default function ProductFilter({
 
   return (
     <div
+      id="product-filter-container"
       className={`w-full lg:w-[20%] h-full border-2 border-orange-200/50 rounded-3xl p-6 flex flex-col items-start overflow-y-auto ${className}`}
     >
       <div className="w-full flex items-center justify-between mb-6">

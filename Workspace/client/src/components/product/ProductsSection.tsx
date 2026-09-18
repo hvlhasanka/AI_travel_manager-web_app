@@ -276,10 +276,10 @@ export default function ProductsSection() {
       )}
       <section
         id="products-section"
-        className="w-full flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-16 min-[1600px]:px-[5%] text-center"
+        className="w-full flex-1 bg-white rounded-2xl min-[1090px]:rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-6 px-4 min-[1090px]:py-16 min-[1090px]:px-16 min-[1600px]:px-[5%] text-center"
       >
         <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 text-left">
-          <div className="flex flex-col md:flex-row md:items-baseline gap-4">
+          <div className="flex flex-col gap-1">
             <h2 className="text-3xl font-bold text-slate-800">
               Travel Products
             </h2>
@@ -288,7 +288,7 @@ export default function ProductsSection() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             {selectedCount > 0 && (
               <div className="flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-sm font-semibold text-slate-600">
                 {selectedCount} {selectedCount === 1 ? "item" : "items"}{" "}
@@ -340,7 +340,7 @@ export default function ProductsSection() {
               </button>
             )}
 
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-full order-last md:order-none md:w-auto">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Sparkles className="h-5 w-5 text-orange-500" />
               </div>
@@ -349,7 +349,7 @@ export default function ProductsSection() {
                 readOnly
                 onClick={() => setIsAiSearchOpen(true)}
                 placeholder="Search any product in your own words..."
-                className="w-full md:w-64 lg:w-70 xl:w-85 pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                className="w-full md:w-64 lg:w-72 xl:w-80 pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
               />
             </div>
             <div className="relative" ref={columnDropdownRef}>
@@ -378,7 +378,17 @@ export default function ProductsSection() {
               )}
             </div>
             <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              onClick={() => {
+                const newState = !isFilterOpen;
+                setIsFilterOpen(newState);
+                if (newState) {
+                  setTimeout(() => {
+                    document
+                      .getElementById("product-filter-container")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }
+              }}
               className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
                 isFilterOpen
                   ? "bg-orange-100 text-orange-600 border-orange-200"
@@ -402,7 +412,7 @@ export default function ProductsSection() {
           <div
             className={`w-full ${
               isFilterOpen ? "lg:w-[80%]" : ""
-            } min-h-[65vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
+            } min-h-[65vh] border-2 border-orange-200/50 rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <ProductsTable
               highlightedProductId={highlightedProductId}
