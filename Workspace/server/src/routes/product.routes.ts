@@ -21,7 +21,7 @@ const router = Router();
 router.get("/list", getProductsHandler);
 router.get("/stats", getProductStatsHandler);
 router.post("/ai-search", aiSearchHandler);
-router.post("/ai-generate", aiGenerateProductHandler);
+router.post("/ai-generate-product", aiGenerateProductHandler);
 router.post("/ai-generate-image", aiGenerateImageHandler);
 router.post("/create", validateRequest(productSchema), createProductHandler);
 router.put(

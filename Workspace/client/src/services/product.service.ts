@@ -173,7 +173,7 @@ export const aiGenerateProduct = async (
   status: string;
 }> => {
   const response = await fetch(
-    `${API_URL}/travel-manager/v1/product/ai-generate`,
+    `${API_URL}/travel-manager/v1/product/ai-generate-product`,
     {
       method: "POST",
       headers: {
