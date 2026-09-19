@@ -12,7 +12,19 @@ const helper = createColumnHelper<typeof features, Product>();
 export const columns = helper.columns([
   helper.display({
     id: "emptyStart",
-    header: "",
+    header: ({ table }) => (
+      <input
+        type="checkbox"
+        checked={table.getIsAllPageRowsSelected()}
+        ref={(input) => {
+          if (input) {
+            input.indeterminate = table.getIsSomePageRowsSelected();
+          }
+        }}
+        onChange={table.getToggleAllPageRowsSelectedHandler()}
+        className="w-5 h-5 rounded-[4px] border-2 border-slate-300 text-primary-500 focus:ring-primary-500 focus:ring-offset-1 transition-all cursor-pointer hover:border-primary-400 bg-white"
+      />
+    ),
     cell: (info) => (
       <input
         type="checkbox"
