@@ -9,6 +9,7 @@ import FullscreenImageOverlay from "@/components/FullscreenImageOverlay";
 
 import { columns, features } from "@/components/product/productsTableColumns";
 import emptyImage from "@/assets/images/empty-suitcase.jpg";
+import { MAX_PRICE } from "@/constants";
 
 export default function ProductsTable({
   highlightedProductId,
@@ -59,6 +60,15 @@ export default function ProductsTable({
     }
     return () => clearTimeout(timer);
   }, [isLoading]);
+
+  const hasActiveFilters = filters
+    ? filters.product !== "" ||
+      filters.destination !== "" ||
+      filters.category !== "" ||
+      filters.minPrice !== 0 ||
+      filters.maxPrice !== MAX_PRICE ||
+      filters.status !== "ALL"
+    : false;
 
   const totalCount = data?.totalCount || 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));
@@ -174,23 +184,31 @@ export default function ProductsTable({
                       alt="Empty suitcase"
                       className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 mb-4 object-contain transition-all duration-300"
                     />
-                    <p className="text-sm text-slate-500 max-w-sm mb-1">
-                      Seems like there're no products
-                    </p>
-                    <p className="text-base font-semibold text-slate-800 mb-6">
-                      Let's create the first product
-                    </p>
-                    {onCreateProduct && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCreateProduct();
-                        }}
-                        className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Create Product
-                      </button>
+                    {hasActiveFilters ? (
+                      <p className="text-base font-semibold text-slate-800 mb-6">
+                        Seems like there're no products
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-sm text-slate-500 max-w-sm mb-1">
+                          Seems like there're no products
+                        </p>
+                        <p className="text-base font-semibold text-slate-800 mb-6">
+                          Let's create the first product
+                        </p>
+                        {onCreateProduct && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onCreateProduct();
+                            }}
+                            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
+                          >
+                            <Plus className="w-5 h-5" />
+                            Create Product
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </td>
