@@ -36,11 +36,13 @@ To build and start both the server and database containers in the background, ru
 docker-compose up -d
 ```
 
-Since the database is empty on the first run, push your Prisma schema to create the tables:
+Since the database is empty on the first run, push your Prisma schema to create the tables. This will also automatically seed the database with sample travel products:
 
 ```bash
 npx prisma db push
 ```
+
+*(If you ever need to run the seed script manually, you can use `npx prisma db seed`)*
 
 To stop both the server and the database, run:
 
@@ -56,7 +58,7 @@ If you prefer to run the API server locally while using Docker only for the data
    ```bash
    docker-compose up db -d
    ```
-2. Push your Prisma schema to create the tables:
+2. Push your Prisma schema to create the tables and automatically seed sample data:
    ```bash
    npx prisma db push
    ```

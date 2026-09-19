@@ -63,11 +63,13 @@ docker-compose up -d
 
 *(To stop them, `docker-compose down`)*
 
-Push the database schema to the running database:
+Push the database schema to the running database (this will also run the seed script automatically to populate sample travel products):
 
 ```bash
 npx prisma db push
 ```
+
+*(If you ever need to run the seed script manually, you can use `npx prisma db seed`)*
 
 *(Alternatively, to run only the database in Docker and the server locally, you can use `docker-compose up db -d` and `npm run dev` in the server directory).*
 
