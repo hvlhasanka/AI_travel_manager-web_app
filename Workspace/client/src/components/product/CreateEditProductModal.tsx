@@ -567,7 +567,7 @@ export default function CreateEditProductModal({
                         <span className="text-sm font-semibold text-primary-600 mb-2">
                           We can generate an image
                         </span>
-                        <ArrowDown className="w-5 h-5 text-primary-600 animate-bounce" />
+                        <ArrowDown className="w-5 h-5 text-primary-600" />
                       </div>
                     )}
                   </div>
