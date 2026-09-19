@@ -221,7 +221,7 @@ export default function ViewProductModal({
               </button>
               <button
                 onClick={() => onEdit(product)}
-                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
               >
                 <Pencil className="w-5 h-5" />
                 <span>Edit Details</span>

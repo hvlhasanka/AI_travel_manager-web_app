@@ -342,14 +342,14 @@ export default function ProductsSection() {
 
             <div className="relative w-full order-last md:order-none md:w-auto">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Sparkles className="h-5 w-5 text-orange-500" />
+                <Sparkles className="h-5 w-5 text-primary-500" />
               </div>
               <input
                 type="text"
                 readOnly
                 onClick={() => setIsAiSearchOpen(true)}
                 placeholder="Search any product in your own words..."
-                className="w-full md:w-[17rem] lg:w-[19rem] xl:w-[22rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                className="w-full md:w-[17rem] lg:w-[19rem] xl:w-[22rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all cursor-pointer"
               />
             </div>
             <div className="relative" ref={columnDropdownRef}>
@@ -357,8 +357,8 @@ export default function ProductsSection() {
                 onClick={() => setIsColumnDropdownOpen(!isColumnDropdownOpen)}
                 className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
                   isColumnDropdownOpen
-                    ? "bg-orange-100 text-orange-600 border-orange-200"
-                    : "bg-white text-slate-600 border-slate-300 hover:text-orange-600 hover:border-orange-300 hover:bg-orange-50"
+                    ? "bg-primary-100 text-primary-600 border-primary-200"
+                    : "bg-white text-slate-600 border-slate-300 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50"
                 }`}
                 title="Toggle Columns"
               >
@@ -391,8 +391,8 @@ export default function ProductsSection() {
               }}
               className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
                 isFilterOpen
-                  ? "bg-orange-100 text-orange-600 border-orange-200"
-                  : "bg-white text-slate-600 border-slate-300 hover:text-orange-600 hover:border-orange-300 hover:bg-orange-50"
+                  ? "bg-primary-100 text-primary-600 border-primary-200"
+                  : "bg-white text-slate-600 border-slate-300 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50"
               }`}
               title="Toggle Filters"
             >
@@ -400,7 +400,7 @@ export default function ProductsSection() {
             </button>
             <button
               onClick={handleCreate}
-              className="flex-shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
+              className="flex-shrink-0 flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
             >
               <Plus className="w-5 h-5" />
               <span className="hidden sm:inline">Create Product</span>
@@ -412,7 +412,7 @@ export default function ProductsSection() {
           <div
             className={`w-full ${
               isFilterOpen ? "lg:w-[80%]" : ""
-            } min-h-[65vh] border-2 border-orange-200/50 rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
+            } min-h-[65vh] border-2 border-primary-200/50 rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <ProductsTable
               highlightedProductId={highlightedProductId}

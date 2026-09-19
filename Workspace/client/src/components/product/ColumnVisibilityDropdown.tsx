@@ -32,7 +32,7 @@ export default function ColumnVisibilityDropdown({
               <div
                 className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                   visibility[col.id] !== false
-                    ? "bg-orange-500 border-orange-500"
+                    ? "bg-primary-500 border-primary-500"
                     : "bg-white border-slate-300"
                 }`}
               >
@@ -55,7 +55,7 @@ export default function ColumnVisibilityDropdown({
                     <div
                       className={`w-3 h-3 rounded-sm border flex items-center justify-center transition-colors ${
                         visibility[child.id] !== false
-                          ? "bg-orange-500 border-orange-500"
+                          ? "bg-primary-500 border-primary-500"
                           : "bg-white border-slate-300"
                       }`}
                     >

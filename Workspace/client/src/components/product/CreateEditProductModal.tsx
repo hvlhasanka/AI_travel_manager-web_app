@@ -160,7 +160,7 @@ export default function CreateEditProductModal({
 
   const createMutation = useMutation({
     mutationFn: createProduct,
-    onSuccess: (data) => {
+    onSuccess: (data: Product | undefined) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["productStats"] });
       onClose();
@@ -184,10 +184,11 @@ export default function CreateEditProductModal({
       productId: string;
       data: Parameters<typeof updateProduct>[1];
     }) => updateProduct(productId, data),
-    onSuccess: (updatedProduct) => {
+    onSuccess: (updatedProduct: Product | undefined) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["productStats"] });
       onClose();
+      if (!updatedProduct) return;
       if (onSuccess)
         onSuccess(
           "Product updated successfully!",
@@ -260,7 +261,7 @@ export default function CreateEditProductModal({
                   type="button"
                   onClick={() => setIsAiGenerateOpen(true)}
                   disabled={isImageGenerating}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Sparkles className="w-4 h-4" />
                   Generate with AI
@@ -297,7 +298,7 @@ export default function CreateEditProductModal({
                       <input
                         type="text"
                         {...register("productName", { required: true })}
-                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.productName ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.productName ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -307,7 +308,7 @@ export default function CreateEditProductModal({
                       <input
                         type="text"
                         {...register("destination", { required: true })}
-                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.destination ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.destination ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -317,7 +318,7 @@ export default function CreateEditProductModal({
                       <input
                         type="text"
                         {...register("category", { required: true })}
-                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.category ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.category ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -327,7 +328,7 @@ export default function CreateEditProductModal({
                       <textarea
                         {...register("description", { required: true })}
                         rows={3}
-                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 resize-none ${errors.description ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 resize-none ${errors.description ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                       />
                     </div>
                   </div>
@@ -394,7 +395,7 @@ export default function CreateEditProductModal({
                                   }
                                   onBlur();
                                 }}
-                                className={`w-full pl-12 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.price ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                                className={`w-full pl-12 pr-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.price ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                               />
                             );
                           }}
@@ -412,7 +413,7 @@ export default function CreateEditProductModal({
                           min: 0,
                           valueAsNumber: true,
                         })}
-                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.inventoryCount ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.inventoryCount ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                       />
                     </div>
                   </div>
@@ -441,7 +442,7 @@ export default function CreateEditProductModal({
                             dateFormat="dd-MM-yyyy"
                             placeholderText="DD-MM-YYYY"
                             strictParsing={true}
-                            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.validFrom ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.validFrom ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                             wrapperClassName="w-full"
                           />
                         )}
@@ -475,7 +476,7 @@ export default function CreateEditProductModal({
                             dateFormat="dd-MM-yyyy"
                             placeholderText="DD-MM-YYYY"
                             strictParsing={true}
-                            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.validUntil ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-orange-500"}`}
+                            className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 ${errors.validUntil ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                             wrapperClassName="w-full"
                           />
                         )}
@@ -495,7 +496,7 @@ export default function CreateEditProductModal({
                         }
                         className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                           status === "ACTIVE"
-                            ? "bg-white text-orange-600 shadow-sm"
+                            ? "bg-white text-primary-600 shadow-sm"
                             : "text-slate-500 hover:text-slate-700"
                         }`}
                       >
@@ -508,7 +509,7 @@ export default function CreateEditProductModal({
                         }
                         className={`px-6 py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                           status === "INACTIVE"
-                            ? "bg-white text-orange-600 shadow-sm"
+                            ? "bg-white text-primary-600 shadow-sm"
                             : "text-slate-500 hover:text-slate-700"
                         }`}
                       >
@@ -558,7 +559,7 @@ export default function CreateEditProductModal({
                     type="button"
                     onClick={handleAiGenerateImage}
                     disabled={isImageGenerating}
-                    className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold text-orange-600 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
                   >
                     {isImageGenerating ? (
                       "Generating..."
@@ -592,7 +593,7 @@ export default function CreateEditProductModal({
                   updateMutation.isPending ||
                   isImageGenerating
                 }
-                className="px-6 py-2.5 font-semibold text-white bg-orange-600 hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors shadow-sm cursor-pointer"
+                className="px-6 py-2.5 font-semibold text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors shadow-sm cursor-pointer"
               >
                 {createMutation.isPending || updateMutation.isPending
                   ? "Saving..."

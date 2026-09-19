@@ -100,8 +100,8 @@ export default function AiOverlay({
             </h2>
           </div>
           <div className="w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl p-4 flex items-center gap-4 animate-slide-down border border-slate-100">
-            <div className="bg-orange-100 p-3 rounded-full flex-shrink-0">
-              <Sparkles className="h-8 w-8 text-orange-500" />
+            <div className="bg-primary-100 p-3 rounded-full flex-shrink-0">
+              <Sparkles className="h-8 w-8 text-primary-500" />
             </div>
             <textarea
               autoFocus
@@ -158,8 +158,8 @@ export default function AiOverlay({
               disabled={isLoading}
               className={`w-full flex items-center justify-center gap-3 font-bold text-xl px-8 py-4 rounded-[2rem] shadow-lg transition-transform ${
                 isLoading
-                  ? "bg-orange-400 text-white/80 cursor-not-allowed"
-                  : "bg-orange-600 hover:bg-orange-700 text-white hover:scale-[1.02] active:scale-95"
+                  ? "bg-primary-400 text-white/80 cursor-not-allowed"
+                  : "bg-primary-600 hover:bg-primary-700 text-white hover:scale-[1.02] active:scale-95"
               }`}
             >
               {isLoading ? (

@@ -19,7 +19,7 @@ export const columns = helper.columns([
         checked={info.row.getIsSelected()}
         onChange={info.row.getToggleSelectedHandler()}
         onClick={(e) => e.stopPropagation()}
-        className="w-5 h-5 rounded-[4px] border-2 border-slate-300 text-orange-500 focus:ring-orange-500 focus:ring-offset-1 transition-all cursor-pointer hover:border-orange-400 bg-white"
+        className="w-5 h-5 rounded-[4px] border-2 border-slate-300 text-primary-500 focus:ring-primary-500 focus:ring-offset-1 transition-all cursor-pointer hover:border-primary-400 bg-white"
       />
     ),
   }),
@@ -41,7 +41,7 @@ export const columns = helper.columns([
               {info.getValue().slice(-6).toUpperCase()}
             </span>
             {isNew && (
-              <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-orange-600 bg-orange-100 rounded-md">
+              <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-primary-600 bg-primary-100 rounded-md">
                 NEW
               </span>
             )}

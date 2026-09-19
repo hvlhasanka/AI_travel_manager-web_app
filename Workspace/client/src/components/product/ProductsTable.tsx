@@ -190,7 +190,7 @@ export default function ProductsTable({
                           e.stopPropagation();
                           onCreateProduct();
                         }}
-                        className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
+                        className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
                       >
                         <Plus className="w-5 h-5" />
                         Create Product
@@ -208,9 +208,9 @@ export default function ProductsTable({
                     onClick={() => onRowClick?.(row.original)}
                     className={`group border-b border-slate-100 transition-colors ${onRowClick ? "cursor-pointer" : ""} ${
                       isAnimated
-                        ? "bg-orange-100/50 animate-bounce-horizontal"
+                        ? "bg-primary-100/50 animate-bounce-horizontal"
                         : row.getIsSelected()
-                          ? "bg-orange-50 hover:bg-orange-100"
+                          ? "bg-primary-50 hover:bg-primary-100"
                           : "hover:bg-slate-50"
                     }`}
                   >
@@ -226,17 +226,17 @@ export default function ProductsTable({
                           cell.column.id === "emptyStart"
                             ? `sticky left-0 z-10 w-6 min-w-[1.5rem] ${
                                 isAnimated
-                                  ? "bg-orange-100"
+                                  ? "bg-primary-100"
                                   : row.getIsSelected()
-                                    ? "bg-orange-50 group-hover:bg-orange-100"
+                                    ? "bg-primary-50 group-hover:bg-primary-100"
                                     : "bg-white group-hover:bg-slate-50"
                               }`
                             : cell.column.id === "productId"
                               ? `sticky left-6 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
                                   isAnimated
-                                    ? "bg-orange-100"
+                                    ? "bg-primary-100"
                                     : row.getIsSelected()
-                                      ? "bg-orange-50 group-hover:bg-orange-100"
+                                      ? "bg-primary-50 group-hover:bg-primary-100"
                                       : "bg-white group-hover:bg-slate-50"
                                 }`
                               : ""
