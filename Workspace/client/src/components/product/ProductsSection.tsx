@@ -5,7 +5,7 @@ import ViewProductModal from "@/components/product/ViewProductModal";
 import AiOverlay from "@/components/product/AiOverlay";
 import ProductFilter, { type FilterFormValues } from "@/components/product/ProductFilter";
 import ExportDropdown from "@/components/product/ExportDropdown";
-import ExportLoadingOverlay from "@/components/product/ExportLoadingOverlay";
+import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
 import ColumnVisibilityDropdown, {
   type ColumnOption,
 } from "@/components/product/ColumnVisibilityDropdown";

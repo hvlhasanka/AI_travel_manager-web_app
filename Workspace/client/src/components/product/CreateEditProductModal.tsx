@@ -9,7 +9,7 @@ import {
   aiGenerateImage,
 } from "@/services/product.service";
 import AiOverlay from "@/components/product/AiOverlay";
-import FullscreenImageOverlay from "@/components/product/FullscreenImageOverlay";
+import FullscreenImageOverlay from "@/components/FullscreenImageOverlay";
 import DiscardConfirmModal from "@/components/product/DiscardConfirmModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
