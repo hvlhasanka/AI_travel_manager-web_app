@@ -11,6 +11,7 @@ interface ViewProductModalProps {
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
   onExportPdf: (product: Product) => Promise<void> | void;
+  hideActions?: boolean;
 }
 
 export default function ViewProductModal({
@@ -20,6 +21,7 @@ export default function ViewProductModal({
   onEdit,
   onDelete,
   onExportPdf,
+  hideActions,
 }: ViewProductModalProps) {
   const [isFullscreenImageOpen, setIsFullscreenImageOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -220,20 +222,24 @@ export default function ViewProductModal({
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
-              <button
-                onClick={() => onDelete(product)}
-                className="flex items-center justify-center w-11 h-11 border border-slate-300 text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl transition-colors shadow-sm focus:outline-none cursor-pointer flex-shrink-0"
-                title="Delete Product"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => onEdit(product)}
-                className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
-              >
-                <Pencil className="w-5 h-5" />
-                <span>Edit Details</span>
-              </button>
+              {!hideActions && (
+                <>
+                  <button
+                    onClick={() => onDelete(product)}
+                    className="flex items-center justify-center w-11 h-11 border border-slate-300 text-slate-700 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-xl transition-colors shadow-sm focus:outline-none cursor-pointer flex-shrink-0"
+                    title="Delete Product"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onEdit(product)}
+                    className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"
+                  >
+                    <Pencil className="w-5 h-5" />
+                    <span>Edit Details</span>
+                  </button>
+                </>
+              )}
               <button
                 onClick={handleExportPdf}
                 className="w-full sm:w-auto px-6 py-2.5 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold transition-colors shadow-sm focus:outline-none cursor-pointer"

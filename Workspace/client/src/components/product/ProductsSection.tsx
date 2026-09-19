@@ -95,6 +95,7 @@ export default function ProductsSection() {
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
   const [productToView, setProductToView] = useState<Product | null>(null);
   const [returnToViewOnClose, setReturnToViewOnClose] = useState(false);
+  const [returnToDeleteOnClose, setReturnToDeleteOnClose] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [banner, setBanner] = useState<{
@@ -266,6 +267,12 @@ export default function ProductsSection() {
         onConfirm={confirmDelete}
         selectedProducts={getSelectedProducts()}
         isPending={deleteMutation.isPending}
+        onRowClick={(product) => {
+          setIsDeleteModalOpen(false);
+          setProductToView(product);
+          setReturnToDeleteOnClose(true);
+          setIsViewModalOpen(true);
+        }}
       />
       {banner && (
         <Banner
@@ -489,9 +496,15 @@ export default function ProductsSection() {
 
       <ViewProductModal
         isOpen={isViewModalOpen}
+        hideActions={returnToDeleteOnClose}
         onClose={() => {
           setIsViewModalOpen(false);
-          setProductToView(null);
+          if (returnToDeleteOnClose) {
+            setIsDeleteModalOpen(true);
+            setReturnToDeleteOnClose(false);
+          } else {
+            setProductToView(null);
+          }
         }}
         product={productToView}
         onEdit={(product) => {
