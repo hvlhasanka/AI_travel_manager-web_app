@@ -123,7 +123,7 @@ export const columns = helper.columns([
           {showTo && (
             <span className="text-xs text-slate-500">
               Until:{" "}
-              <span className="font-semibold text-slate-700">
+              <span className="min-[1390px]:pl-1 font-semibold text-slate-700">
                 {new Date(info.getValue()).toLocaleDateString()}
               </span>
             </span>

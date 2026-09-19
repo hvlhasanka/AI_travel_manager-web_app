@@ -88,8 +88,8 @@ export default function ProductsTable({
   });
 
   return (
-    <div className="w-full flex flex-col h-full">
-      <div className="w-full overflow-x-auto flex-1 max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden">
+    <div className="w-full flex flex-col flex-1">
+      <div className="w-full overflow-auto flex-1 max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -99,12 +99,10 @@ export default function ProductsTable({
                     key={header.id}
                     className={`${header.id === "emptyStart" ? "px-0 text-center" : "px-4"} py-3 text-sm font-semibold text-slate-600 uppercase tracking-wider ${
                       header.id === "emptyStart"
-                        ? "sticky left-0 bg-white z-10 w-6 min-w-[1.5rem]"
-                        : header.id === "productId"
-                          ? "sticky left-6 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
-                          : header.id === "description"
-                            ? "w-[150px] min-w-[150px]"
-                            : ""
+                        ? "sticky left-0 bg-white z-10 w-6 min-w-[1.5rem] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                        : header.id === "description"
+                          ? "w-[150px] min-w-[150px]"
+                          : ""
                     }`}
                   >
                     {header.isPlaceholder ? null : (
@@ -129,10 +127,8 @@ export default function ProductsTable({
                         key={header.id}
                         className={`${columnId === "emptyStart" ? "px-0 text-center" : "px-4"} py-4 ${
                           columnId === "emptyStart"
-                            ? "sticky left-0 z-10 w-6 min-w-[1.5rem] bg-white"
-                            : columnId === "productId"
-                              ? "sticky left-6 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] bg-white"
-                              : ""
+                            ? "sticky left-0 z-10 w-6 min-w-[1.5rem] bg-white shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]"
+                            : ""
                         }`}
                       >
                         <div
@@ -224,22 +220,14 @@ export default function ProductsTable({
                         }}
                         className={`${cell.column.id === "emptyStart" ? "px-0 text-center" : "px-4"} py-4 text-sm text-slate-700 ${
                           cell.column.id === "emptyStart"
-                            ? `sticky left-0 z-10 w-6 min-w-[1.5rem] ${
+                            ? `sticky left-0 z-10 w-6 min-w-[1.5rem] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
                                 isAnimated
                                   ? "bg-primary-100"
                                   : row.getIsSelected()
                                     ? "bg-primary-50 group-hover:bg-primary-100"
                                     : "bg-white group-hover:bg-slate-50"
                               }`
-                            : cell.column.id === "productId"
-                              ? `sticky left-6 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] ${
-                                  isAnimated
-                                    ? "bg-primary-100"
-                                    : row.getIsSelected()
-                                      ? "bg-primary-50 group-hover:bg-primary-100"
-                                      : "bg-white group-hover:bg-slate-50"
-                                }`
-                              : ""
+                            : ""
                         }`}
                       >
                         <table.FlexRender cell={cell} />

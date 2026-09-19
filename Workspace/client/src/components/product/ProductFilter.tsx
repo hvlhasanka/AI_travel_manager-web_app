@@ -58,27 +58,37 @@ export default function ProductFilter({
   return (
     <div
       id="product-filter-container"
-      className={`w-full lg:w-[20%] h-full border-2 border-primary-200/50 rounded-3xl p-6 flex flex-col items-start overflow-y-auto ${className}`}
+      className={`w-full border-2 border-primary-200/50 rounded-3xl p-6 flex flex-col gap-4 ${className}`}
     >
-      <div className="w-full flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-slate-800">Filter</h3>
+      <div className="w-full flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h3 className="text-xl font-bold text-slate-800">Filter</h3>
+          <button
+            type="button"
+            onClick={() => {
+              reset();
+              onReset?.();
+            }}
+            className="text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors cursor-pointer"
+          >
+            Reset
+          </button>
+        </div>
         <button
-          type="button"
-          onClick={() => {
-            reset();
-            onReset?.();
-          }}
-          className="text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors cursor-pointer"
+          type="submit"
+          form="product-filter-form"
+          className="py-2 px-6 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg transition-colors shadow-sm cursor-pointer"
         >
-          Reset
+          Apply
         </button>
       </div>
 
       <form
+        id="product-filter-form"
         onSubmit={handleSubmit(onFilter)}
-        className="w-full flex flex-col gap-4 text-left"
+        className="w-full flex flex-row flex-wrap items-start gap-6 text-left"
       >
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full md:w-auto md:flex-1 md:min-w-[150px]">
           <label className="text-sm font-semibold text-slate-700">
             Product
           </label>
@@ -89,7 +99,7 @@ export default function ProductFilter({
           />
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 flex-1 min-w-[120px] md:min-w-[150px]">
           <label className="text-sm font-semibold text-slate-700">
             Destination
           </label>
@@ -100,7 +110,7 @@ export default function ProductFilter({
           />
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 flex-1 min-w-[120px] md:min-w-[150px]">
           <label className="text-sm font-semibold text-slate-700">
             Category
           </label>
@@ -111,10 +121,20 @@ export default function ProductFilter({
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-slate-700">
-            Price Range
+        <div className="flex flex-col gap-1 flex-1 min-w-[200px] md:-mt-5">
+          <label className="text-sm font-semibold text-slate-700 flex justify-between items-center">
+            <span>Price Range</span>
+            <span className="text-xs text-slate-500 font-normal">
+              Max: LKR {maxPrice}
+            </span>
           </label>
+          <input
+            type="range"
+            min="0"
+            max={MAX_PRICE}
+            {...register("maxPrice")}
+            className="w-full accent-primary-500 mb-1"
+          />
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -130,19 +150,9 @@ export default function ProductFilter({
               className="w-1/2 px-2 py-1.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
-          <input
-            type="range"
-            min="0"
-            max={MAX_PRICE}
-            {...register("maxPrice")}
-            className="w-full mt-2 accent-primary-500"
-          />
-          <div className="text-xs text-slate-500 text-right">
-            Max: LKR {maxPrice}
-          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 flex-1 min-w-[200px]">
           <label className="text-sm font-semibold text-slate-700">Status</label>
           <div className="flex items-center gap-2">
             {["ALL", "ACTIVE", "INACTIVE"].map((s) => (
@@ -161,13 +171,6 @@ export default function ProductFilter({
             ))}
           </div>
         </div>
-
-        <button
-          type="submit"
-          className="mt-4 w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg transition-colors shadow-sm cursor-pointer"
-        >
-          Apply
-        </button>
       </form>
     </div>
   );

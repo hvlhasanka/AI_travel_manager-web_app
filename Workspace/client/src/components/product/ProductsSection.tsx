@@ -3,7 +3,9 @@ import { columns as tableColumns } from "@/components/product/productsTableColum
 import CreateEditProductModal from "@/components/product/CreateEditProductModal";
 import ViewProductModal from "@/components/product/ViewProductModal";
 import AiOverlay from "@/components/product/AiOverlay";
-import ProductFilter, { type FilterFormValues } from "@/components/product/ProductFilter";
+import ProductFilter, {
+  type FilterFormValues,
+} from "@/components/product/ProductFilter";
 import ExportDropdown from "@/components/product/ExportDropdown";
 import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
 import ColumnVisibilityDropdown, {
@@ -403,16 +405,21 @@ export default function ProductsSection() {
               className="flex-shrink-0 flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
             >
               <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Create Product</span>
+              <span>Create Product</span>
             </button>
           </div>
         </div>
-        <div className="w-full flex flex-col lg:flex-row gap-6 h-full min-h-[400px]">
+        <div className="w-full flex flex-col gap-6 h-full min-h-[400px]">
+          {/* Filter Inner Container */}
+          <ProductFilter
+            onFilter={onSubmit}
+            onReset={() => setFilters(null)}
+            className={isFilterOpen ? "flex" : "hidden"}
+            externalFilters={filters}
+          />
           {/* Products Table Inner Container */}
           <div
-            className={`w-full ${
-              isFilterOpen ? "lg:w-[80%]" : ""
-            } min-h-[65vh] border-2 border-primary-200/50 rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
+            className={`w-full min-h-[65vh] border-2 border-primary-200/50 rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <ProductsTable
               highlightedProductId={highlightedProductId}
@@ -425,13 +432,6 @@ export default function ProductsSection() {
               onCreateProduct={handleCreate}
             />
           </div>
-          {/* Filter Inner Container */}
-          <ProductFilter
-            onFilter={onSubmit}
-            onReset={() => setFilters(null)}
-            className={isFilterOpen ? "flex" : "hidden"}
-            externalFilters={filters}
-          />
         </div>
       </section>
 
