@@ -2,7 +2,7 @@
 
 ## 1. Description
 
-This is the frontend portion of the AI Travel Manager Web App. It is a React.js application created with Vite, using TypeScript and Tailwind CSS for styling. It handles user interaction, state management, and communication with the backend API.
+This is the frontend portion of the AI Travel Manager Web App. It is a React.js application created with Vite, using TypeScript and Tailwind CSS for styling. It handles user interaction, state management, image uploads (Cloudinary), PDF/Excel exports, AI-powered generation (text and images), and provides mobile responsive UI for seamless communication with the backend API.
 
 ## 2. Prerequisites
 

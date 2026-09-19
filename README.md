@@ -13,8 +13,12 @@ With full functionality across creating, editing, viewing, and deleting travel p
 
 1. **Travel Product Management** - Create, view, update, and delete travel products (destinations, categories, prices, validity dates).
 2. **AI Search** - Search for travel products using natural language powered by AI.
-3. **AI Product Generation** - Automatically generate details for new travel products based on minimal inputs.
-4. **Dashboard Stats** - View statistics of all travel products.
+3. **AI Product Generation** - Automatically generate details for new travel products based on minimal inputs with OpenAI.
+4. **AI Image Generation** - Generate product images with OpenAI.
+5. **Image Management** - Upload and delete images to and from Cloudinary.
+6. **Data Export** - Export a collection of products to Excel or PDF with a card layout, or export a single product to PDF in a full page view layout.
+7. **Dashboard Stats** - View statistics of all travel products.
+8. **Responsive UI** - Mobile responsive UI for seamless usage across devices.
 
 ## 2. System Architecture
 
@@ -28,6 +32,7 @@ With full functionality across creating, editing, viewing, and deleting travel p
 - **Frontend**: React (Vite), Tailwind CSS v4, TanStack Query (React Query), TanStack Table (React Table), `react-hook-form`, `lucide-react`
 - **Backend**: Node.js, Express, Prisma ORM, `express-rate-limit`, `zod` schema validation, and OpenAI API integration
 - **Database**: PostgreSQL
+- **Media Storage**: Cloudinary
 
 ## 3. Installation
 
@@ -85,7 +90,7 @@ npm run dev    # http://localhost:5173
 ### 4.1. Non-functional Features
 
 - **AI Integration** -
-    - Leverages OpenAI for product search and generative product creation.
+    - Leverages OpenAI for product search, generative product creation, and image generation.
 - **Security** -
     - Rate limit protection for all API endpoints using `express-rate-limit`.
 - **Input Validation** -
@@ -106,8 +111,14 @@ npm run dev    # http://localhost:5173
     - Update or delete existing products.
 - **AI Search** -
     - Use natural language to search and filter products based on AI understanding rather than strict keyword matching.
-- **AI Product Generator** -
-    - Generate complete product descriptions and details using AI prompts.
+- **AI Product & Image Generator** -
+    - Generate complete product descriptions and details using AI prompts with OpenAI.
+    - Generate product images using OpenAI.
+- **Image Management** -
+    - Upload and delete images to and from Cloudinary.
+- **Data Export** -
+    - Export a collection of products to Excel or PDF with a card layout.
+    - Export a single product to PDF in a full page view layout.
 - **Dashboard Statistics** -
     - Get an overview of the number of products in the inventory.
 

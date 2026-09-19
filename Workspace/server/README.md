@@ -2,7 +2,7 @@
 
 ## 1. Description
 
-This is a Node.js Express backend created with TypeScript for the AI Travel Manager Web App. It handles the RESTful API for managing travel products, integrates with OpenAI for AI features, and connects to a PostgreSQL database using Prisma ORM.
+This is a Node.js Express backend created with TypeScript for the AI Travel Manager Web App. It handles the RESTful API for managing travel products, integrates with OpenAI for AI text and image generation, manages image uploads/deletions with Cloudinary, supports PDF and Excel data exports, and connects to a PostgreSQL database using Prisma ORM.
 
 ## 2. Prerequisites
 
@@ -114,4 +114,7 @@ The `src` directory contains the core application logic, structured as follows:
 | `PUT`    | `/:productId/edit`      | Update an existing travel product's details.  |
 | `DELETE` | `/delete`               | Delete travel products.                      |
 | `POST`   | `/ai-search`            | AI-powered search for travel products.        |
-| `POST`   | `/ai-generate`          | Generate travel product details via AI.       |
+| `POST`   | `/ai-generate-product`  | Generate travel product details via AI.       |
+| `POST`   | `/ai-generate-image`    | Generate travel product image via AI.         |
+| `POST`   | `/export-excel`         | Export travel products to an Excel file.      |
+| `POST`   | `/export-pdf`           | Export travel products to a PDF file.         |
