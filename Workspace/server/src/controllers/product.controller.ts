@@ -173,7 +173,7 @@ export const aiGenerateProductHandler = async (req: Request, res: Response) => {
       messages: [
         {
           role: "system",
-          content: `You are an expert travel product creator. Extract or generate travel product details based on the user's natural language description. Provide all fields for a product creation form. If a specific detail is missing, make a reasonable guess or leave it as an empty string (or 0 for numbers). Use ISO datetime for dates.`,
+          content: `You are an expert travel product creator. Extract or generate travel product details based on the user's natural language description. Provide all fields for a product creation form. If a specific detail is missing, make a reasonable guess or leave it as an empty string (or 0 for numbers). Use ISO datetime for dates. The current date and time is ${new Date().toISOString()}.`,
         },
         { role: "user", content: prompt },
       ],
