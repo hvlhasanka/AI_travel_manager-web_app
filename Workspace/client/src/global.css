@@ -95,3 +95,24 @@ body {
 .animate-bounce-horizontal {
   animation: bounceHorizontal 1s 5;
 }
+
+@keyframes customFloat {
+  0% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); }
+  33% { transform: translateY(-80px) translateX(40px) rotate(5deg) scale(1.1); }
+  66% { transform: translateY(40px) translateX(-60px) rotate(-5deg) scale(0.9); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); }
+}
+
+.animate-float {
+  animation: customFloat 5s ease-in-out infinite !important;
+}
+
+.animate-float-delayed {
+  animation: customFloat 6s ease-in-out infinite !important;
+  animation-delay: -2s !important;
+}
+
+.animate-float-slow {
+  animation: customFloat 7s ease-in-out infinite !important;
+  animation-delay: -4s !important;
+}
