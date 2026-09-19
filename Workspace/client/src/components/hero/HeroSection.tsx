@@ -1,4 +1,4 @@
-import heroCoverImage from "../../../assets/images/hero-cover-image.jpg";
+import heroCoverImage from "../../assets/images/hero-cover-image.jpg";
 import StatCardSection from "./StatCardSection";
 import BrowseProductsButton from "./BrowseProductsButton";
 import HeroHeader from "./HeroHeader";

@@ -8,7 +8,7 @@ import type { FilterFormValues } from "./ProductFilter";
 import FullscreenImageOverlay from "./FullscreenImageOverlay";
 
 import { columns, features } from "./productsTableColumns";
-import emptyImage from "../../../assets/images/empty-suitcase.jpg";
+import emptyImage from "../../assets/images/empty-suitcase.jpg";
 
 export default function ProductsTable({
   highlightedProductId,
