@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import StatCard from "./StatCard";
-import Banner from "../Banner";
+import StatCard from "@/components/hero/StatCard";
+import Banner from "@/components/Banner";
 
-import { fetchStats } from "../../services/product.service";
+import { fetchStats } from "@/services/product.service";
 
 function StatCardSkeleton({ hasBadge = false }: { hasBadge?: boolean }) {
   return (
     <div className="bg-white/70 backdrop-blur-md p-6 rounded-xl shadow-lg flex flex-col justify-between h-36 animate-pulse">
       <div className="w-full flex justify-between items-start">
-        <div className="h-10 w-16 bg-orange-900/20 rounded"></div>
+        <div className="h-10 w-16 bg-primary-900/20 rounded"></div>
         {hasBadge && (
-          <div className="h-6 w-24 bg-orange-900/20 rounded-full"></div>
+          <div className="h-6 w-24 bg-primary-900/20 rounded-full"></div>
         )}
       </div>
-      <div className="h-6 w-32 bg-orange-900/20 rounded"></div>
+      <div className="h-6 w-32 bg-primary-900/20 rounded"></div>
     </div>
   );
 }

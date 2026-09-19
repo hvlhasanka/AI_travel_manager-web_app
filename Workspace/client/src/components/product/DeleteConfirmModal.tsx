@@ -1,4 +1,4 @@
-import type { Product } from "../../types/product.types";
+import type { Product } from "@/types/product.types";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -6,6 +6,7 @@ interface DeleteConfirmModalProps {
   onConfirm: () => void;
   selectedProducts: Product[];
   isPending?: boolean;
+  onRowClick?: (product: Product) => void;
 }
 
 export default function DeleteConfirmModal({
@@ -14,6 +15,7 @@ export default function DeleteConfirmModal({
   onConfirm,
   selectedProducts,
   isPending,
+  onRowClick,
 }: DeleteConfirmModalProps) {
   if (!isOpen) return null;
 
@@ -33,6 +35,7 @@ export default function DeleteConfirmModal({
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50 sticky top-0">
               <tr>
+                <th />
                 <th className="px-4 py-3 text-sm font-semibold text-slate-600 border-b border-slate-200">
                   Product ID
                 </th>
@@ -43,7 +46,7 @@ export default function DeleteConfirmModal({
                   Price
                 </th>
                 <th className="px-4 py-3 text-sm font-semibold text-slate-600 border-b border-slate-200">
-                  Validity
+                  Valid Until
                 </th>
                 <th className="px-4 py-3 text-sm font-semibold text-slate-600 border-b border-slate-200">
                   Status
@@ -51,11 +54,15 @@ export default function DeleteConfirmModal({
               </tr>
             </thead>
             <tbody>
-              {selectedProducts.map((p) => (
+              {selectedProducts.map((p, index) => (
                 <tr
                   key={p.productId}
-                  className="hover:bg-slate-50 transition-colors"
+                  className={`hover:bg-slate-50 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                  onClick={() => onRowClick?.(p)}
                 >
+                  <td className="px-2 py-3 text-sm text-slate-500 border-b border-slate-100 text-center">
+                    {index + 1}
+                  </td>
                   <td className="px-4 py-3 text-sm text-slate-500 border-b border-slate-100">
                     {p.productId.slice(-6).toUpperCase()}
                   </td>
@@ -84,7 +91,7 @@ export default function DeleteConfirmModal({
               {selectedProducts.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-4 text-center text-slate-500 text-sm"
                   >
                     No products found.

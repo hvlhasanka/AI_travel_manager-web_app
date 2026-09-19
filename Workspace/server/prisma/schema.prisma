@@ -13,6 +13,7 @@ model Product {
   destination    String
   category       String
   description    String
+  imageUrl       String?
   price          Float
   inventoryCount Int      @default(0)
   validFrom      DateTime

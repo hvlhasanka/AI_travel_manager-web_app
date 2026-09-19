@@ -2,9 +2,9 @@ import type {
   Product,
   ProductStats,
   GetProductsResponse,
-} from "../types/product.types";
-import type { FilterFormValues } from "../components/product/ProductFilter";
-import { MAX_PRICE } from "../constants";
+} from "@/types/product.types";
+import type { FilterFormValues } from "@/components/product/ProductFilter";
+import { MAX_PRICE } from "@/constants";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -173,7 +173,7 @@ export const aiGenerateProduct = async (
   status: string;
 }> => {
   const response = await fetch(
-    `${API_URL}/travel-manager/v1/product/ai-generate`,
+    `${API_URL}/travel-manager/v1/product/ai-generate-product`,
     {
       method: "POST",
       headers: {
@@ -186,4 +186,117 @@ export const aiGenerateProduct = async (
     throw new Error("Failed to generate product via AI");
   }
   return response.json();
+};
+
+export const aiGenerateImage = async (data: {
+  productName: string;
+  description: string;
+  destination: string;
+  category: string;
+}): Promise<{ imageUrl: string }> => {
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/ai-generate-image`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    },
+  );
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.error || "Failed to generate image via AI");
+  }
+  return response.json();
+};
+
+export const exportProducts = async (
+  selectedIds: string[],
+  filters?: FilterFormValues | null,
+  columnVisibility?: Record<string, boolean>,
+): Promise<void> => {
+  const payload =
+    selectedIds.length > 0
+      ? { productIds: selectedIds, columnVisibility }
+      : {
+          searchValue: filters?.product,
+          destination: filters?.destination,
+          category: filters?.category,
+          minPrice: filters?.minPrice,
+          maxPrice: filters?.maxPrice,
+          status: filters?.status,
+          columnVisibility,
+        };
+
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/export-excel`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to export products");
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "products_export.xlsx");
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
+export const exportProductsPdf = async (
+  selectedIds: string[],
+  filters?: FilterFormValues | null,
+  columnVisibility?: Record<string, boolean>,
+  layout: "single" | "grid" = "grid",
+): Promise<void> => {
+  const payload =
+    selectedIds.length > 0
+      ? { productIds: selectedIds, columnVisibility, layout }
+      : {
+          searchValue: filters?.product,
+          destination: filters?.destination,
+          category: filters?.category,
+          minPrice: filters?.minPrice,
+          maxPrice: filters?.maxPrice,
+          status: filters?.status,
+          columnVisibility,
+          layout,
+        };
+
+  const response = await fetch(
+    `${API_URL}/travel-manager/v1/product/export-pdf`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to export products to PDF");
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", "products_export.pdf");
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+  window.URL.revokeObjectURL(url);
 };

@@ -2,7 +2,7 @@
 
 ## 1. Description
 
-This is a Node.js Express backend created with TypeScript for the AI Travel Manager Web App. It handles the RESTful API for managing travel products, integrates with OpenAI for AI features, and connects to a PostgreSQL database using Prisma ORM.
+This is a Node.js Express backend created with TypeScript for the AI Travel Manager Web App. It handles the RESTful API for managing travel products, integrates with OpenAI for AI text and image generation, manages image uploads/deletions with Cloudinary, supports PDF and Excel data exports, and connects to a PostgreSQL database using Prisma ORM.
 
 ## 2. Prerequisites
 
@@ -26,35 +26,46 @@ cp .env.example .env
 
 *(Make sure to fill in your `OPENAI_API_KEY` to enable AI features).*
 
-### Database Setup (Docker Alternative)
+### Running with Docker
 
-To run PostgreSQL locally for development, make sure you have Docker installed and run:
+You can run both the API server and the PostgreSQL database together using Docker Compose. Make sure you have Docker installed.
+
+To build and start both the server and database containers in the background, run:
 
 ```bash
-docker compose up db -d
+docker-compose up -d
 ```
 
-This will start a PostgreSQL container in the background.
-
-Since the database is empty on the first run, push your Prisma schema to create the tables:
+Since the database is empty on the first run, push your Prisma schema to create the tables. This will also automatically seed the database with sample travel products:
 
 ```bash
 npx prisma db push
 ```
 
-To stop the database, run:
+*(If you ever need to run the seed script manually, you can use `npx prisma db seed`)*
+
+To stop both the server and the database, run:
 
 ```bash
-docker compose down
+docker-compose down
 ```
 
-### Start the Server
+### Local Development (Without Docker for Server)
 
-Once the database is ready, you can start the API server:
+If you prefer to run the API server locally while using Docker only for the database:
 
-```bash
-npm run dev
-```
+1. Start only the database:
+   ```bash
+   docker-compose up db -d
+   ```
+2. Push your Prisma schema to create the tables and automatically seed sample data:
+   ```bash
+   npx prisma db push
+   ```
+3. Start the API server:
+   ```bash
+   npm run dev
+   ```
 
 ## 4. Available Scripts
 
@@ -103,4 +114,7 @@ The `src` directory contains the core application logic, structured as follows:
 | `PUT`    | `/:productId/edit`      | Update an existing travel product's details.  |
 | `DELETE` | `/delete`               | Delete travel products.                      |
 | `POST`   | `/ai-search`            | AI-powered search for travel products.        |
-| `POST`   | `/ai-generate`          | Generate travel product details via AI.       |
+| `POST`   | `/ai-generate-product`  | Generate travel product details via AI.       |
+| `POST`   | `/ai-generate-image`    | Generate travel product image via AI.         |
+| `POST`   | `/export-excel`         | Export travel products to an Excel file.      |
+| `POST`   | `/export-pdf`           | Export travel products to a PDF file.         |

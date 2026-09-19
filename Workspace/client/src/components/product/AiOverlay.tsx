@@ -1,7 +1,9 @@
 import { Sparkles, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import DiscardConfirmModal from "./DiscardConfirmModal";
+import DiscardConfirmModal from "@/components/product/DiscardConfirmModal";
+import PoweredByOpenAi from "@/components/product/PoweredByOpenAi";
+import Banner from "@/components/Banner";
 
 interface AiOverlayProps {
   isOpen: boolean;
@@ -33,11 +35,19 @@ export default function AiOverlay({
   isLoading = false,
 }: AiOverlayProps) {
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  const [bannerMsg, setBannerMsg] = useState<string | null>(null);
+  const [isShaking, setIsShaking] = useState(false);
 
-  const { register, handleSubmit, watch, setValue, reset } =
-    useForm<AiFormData>({
-      defaultValues: { query: "" },
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<AiFormData>({
+    defaultValues: { query: "" },
+  });
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const aiQuery = watch("query");
@@ -47,6 +57,7 @@ export default function AiOverlay({
     if (!isOpen) {
       reset({ query: "" });
       setShowDiscardConfirm(false);
+      setBannerMsg(null);
     }
   }, [isOpen, reset]);
 
@@ -61,7 +72,14 @@ export default function AiOverlay({
   };
 
   const handleFormSubmit = (data: AiFormData) => {
+    setBannerMsg(null);
     onSubmit(data.query);
+  };
+
+  const handleFormError = () => {
+    setIsShaking(true);
+    setBannerMsg("Please enter a prompt to continue");
+    setTimeout(() => setIsShaking(false), 300);
   };
 
   // We need to extract the register props to add our own focus handlers
@@ -74,10 +92,15 @@ export default function AiOverlay({
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all"
-        onClick={handleClose}
-      >
+      {bannerMsg && (
+        <Banner
+          type="error"
+          message={bannerMsg}
+          duration={3000}
+          onClose={() => setBannerMsg(null)}
+        />
+      )}
+      <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -90,18 +113,24 @@ export default function AiOverlay({
         </button>
 
         <form
-          onSubmit={handleSubmit(handleFormSubmit)}
+          onSubmit={handleSubmit(handleFormSubmit, handleFormError)}
           className="w-full flex flex-col items-center"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="w-full max-w-3xl mb-6 animate-slide-down">
+          <div className="w-full max-w-3xl mb-6">
             <h2 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg text-center md:text-left">
               {title}
             </h2>
           </div>
-          <div className="w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl p-4 flex items-center gap-4 animate-slide-down border border-slate-100">
-            <div className="bg-orange-100 p-3 rounded-full flex-shrink-0">
-              <Sparkles className="h-8 w-8 text-orange-500" />
+          <div
+            className={`w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-4 border transition-all ${
+              errors.query
+                ? "border-red-500 ring-4 ring-red-500/20 animate-shake"
+                : "border-slate-100"
+            } ${isShaking ? "animate-shake" : ""}`}
+          >
+            <div className="bg-primary-100 p-2 sm:p-3 rounded-full flex-shrink-0">
+              <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary-500" />
             </div>
             <textarea
               autoFocus
@@ -130,7 +159,7 @@ export default function AiOverlay({
           {/* Suggestions */}
           {suggestions.length > 0 && (
             <div
-              className="w-full max-w-3xl mt-4 bg-white rounded-3xl shadow-xl p-6 animate-slide-down border border-slate-100"
+              className="w-full max-w-3xl mt-4 bg-white rounded-3xl shadow-xl p-6 border border-slate-100"
               onMouseDown={(e) => e.preventDefault()}
             >
               <div className="text-sm font-semibold text-slate-400 mb-4 px-2">
@@ -152,14 +181,14 @@ export default function AiOverlay({
             </div>
           )}
 
-          <div className="w-full max-w-3xl flex mt-12 animate-slide-down">
+          <div className="w-full max-w-3xl flex mt-12">
             <button
               type="submit"
               disabled={isLoading}
               className={`w-full flex items-center justify-center gap-3 font-bold text-xl px-8 py-4 rounded-[2rem] shadow-lg transition-transform ${
                 isLoading
-                  ? "bg-orange-400 text-white/80 cursor-not-allowed"
-                  : "bg-orange-600 hover:bg-orange-700 text-white hover:scale-[1.02] active:scale-95"
+                  ? "bg-primary-400 text-white/80 cursor-not-allowed"
+                  : "bg-primary-600 hover:bg-primary-700 text-white hover:scale-[1.02] active:scale-95"
               }`}
             >
               {isLoading ? (
@@ -187,6 +216,8 @@ export default function AiOverlay({
           title={discardTitle}
           description={discardDescription}
         />
+
+        <PoweredByOpenAi />
       </div>
     </>
   );

@@ -11,6 +11,7 @@ export interface Product {
   destination: string;
   category: string;
   description: string;
+  imageUrl?: string | null;
   price: number;
   inventoryCount: number;
   validFrom: string;

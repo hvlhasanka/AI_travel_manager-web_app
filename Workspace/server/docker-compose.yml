@@ -12,10 +12,12 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  server:
+  api:
     build: .
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/travel_manager?schema=public
       - PORT=3000

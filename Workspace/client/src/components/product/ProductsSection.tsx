@@ -1,29 +1,101 @@
-import ProductsTable from "./ProductsTable";
-import CreateEditProductModal from "./CreateEditProductModal";
-import ViewProductModal from "./ViewProductModal";
-import AiOverlay from "./AiOverlay";
-import ProductFilter, { type FilterFormValues } from "./ProductFilter";
-import { Plus, Sparkles, Pencil, Trash2, Filter } from "lucide-react";
-import { MAX_PRICE } from "../../constants";
-import { useState } from "react";
-import Banner from "../Banner";
+import ProductsTable from "@/components/product/ProductsTable";
+import { columns as tableColumns } from "@/components/product/productsTableColumns";
+import CreateEditProductModal from "@/components/product/CreateEditProductModal";
+import ViewProductModal from "@/components/product/ViewProductModal";
+import AiOverlay from "@/components/product/AiOverlay";
+import ProductFilter, {
+  type FilterFormValues,
+} from "@/components/product/ProductFilter";
+import ExportDropdown from "@/components/product/ExportDropdown";
+import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
+import ColumnVisibilityDropdown, {
+  type ColumnOption,
+} from "@/components/product/ColumnVisibilityDropdown";
+import {
+  Plus,
+  Sparkles,
+  Pencil,
+  Trash2,
+  Filter,
+  Download,
+  ChevronDown,
+  Columns,
+} from "lucide-react";
+import { MAX_PRICE } from "@/constants";
+import { useState, useRef, useEffect, useMemo } from "react";
+import Banner from "@/components/Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   deleteProduct,
   aiSearchProducts,
-} from "../../services/product.service";
-import DeleteConfirmModal from "./DeleteConfirmModal";
-import type { Product } from "../../types/product.types";
+  exportProducts,
+  exportProductsPdf,
+} from "@/services/product.service";
+import DeleteConfirmModal from "@/components/product/DeleteConfirmModal";
+import type { Product } from "@/types/product.types";
 
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
+  const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
+  const [columnVisibility, setColumnVisibility] = useState<
+    Record<string, boolean>
+  >({});
+
+  const exportDropdownRef = useRef<HTMLDivElement>(null);
+  const columnDropdownRef = useRef<HTMLDivElement>(null);
+
+  const columnOptions = useMemo<ColumnOption[]>(() => {
+    const opts = tableColumns
+      .filter((col) => col.id !== "emptyStart")
+      .map((col) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const id = (col.id || (col as any).accessorKey) as string;
+        const label = (col.header as string) || id;
+        if (id === "validUntil") {
+          return {
+            id,
+            label,
+            children: [
+              { id: "validFrom", label: "Valid From" },
+              { id: "validTo", label: "Valid Until" },
+            ],
+          };
+        }
+        return { id, label };
+      });
+
+    opts.splice(1, 0, { id: "imageUrl", label: "Image" });
+    return opts;
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        exportDropdownRef.current &&
+        !exportDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsExportDropdownOpen(false);
+      }
+      if (
+        columnDropdownRef.current &&
+        !columnDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsColumnDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
   const [productToView, setProductToView] = useState<Product | null>(null);
   const [returnToViewOnClose, setReturnToViewOnClose] = useState(false);
+  const [returnToDeleteOnClose, setReturnToDeleteOnClose] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [banner, setBanner] = useState<{
@@ -68,9 +140,15 @@ export default function ProductsSection() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ([, data]: any) => data?.products || [],
     );
-    return allProducts.filter((p: Product) =>
-      selectedIds.includes(p.productId),
-    );
+
+    const uniqueProductsMap = new Map<string, Product>();
+    allProducts.forEach((p: Product) => {
+      if (selectedIds.includes(p.productId)) {
+        uniqueProductsMap.set(p.productId, p);
+      }
+    });
+
+    return Array.from(uniqueProductsMap.values());
   };
 
   const handleDelete = () => {
@@ -147,8 +225,40 @@ export default function ProductsSection() {
     }
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportClick = async (
+    type: "selected" | "filtered",
+    format: "excel" | "pdf",
+  ) => {
+    setIsExportDropdownOpen(false);
+    setIsExporting(true);
+    try {
+      const ids = type === "selected" ? selectedIds : [];
+      const appliedFilters = type === "filtered" ? filters : null;
+      if (format === "excel") {
+        await exportProducts(ids, appliedFilters, columnVisibility);
+      } else {
+        await exportProductsPdf(ids, appliedFilters, columnVisibility);
+      }
+      setBanner({
+        type: "success",
+        message: `${format === "excel" ? "Excel" : "PDF"} document ready to download`,
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      setBanner({
+        type: "error",
+        message: `Failed to export ${format === "excel" ? "Excel" : "PDF"} document`,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <>
+      <ExportLoadingOverlay isOpen={isExporting} />
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
@@ -163,22 +273,28 @@ export default function ProductsSection() {
         onConfirm={confirmDelete}
         selectedProducts={getSelectedProducts()}
         isPending={deleteMutation.isPending}
+        onRowClick={(product) => {
+          setIsDeleteModalOpen(false);
+          setProductToView(product);
+          setReturnToDeleteOnClose(true);
+          setIsViewModalOpen(true);
+        }}
       />
       {banner && (
         <Banner
           key={banner.message}
           type={banner.type}
           message={banner.message}
-          duration={3000}
+          duration={5000}
           onClose={() => setBanner(null)}
         />
       )}
       <section
         id="products-section"
-        className="w-full flex-1 bg-white rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-16 px-16 min-[1600px]:px-[5%] text-center"
+        className="w-full flex-1 bg-white rounded-2xl min-[1090px]:rounded-[3rem] shadow-sm flex flex-col items-center py-6 px-4 min-[1090px]:py-16 min-[1090px]:px-16 min-[1600px]:px-[5%] text-center"
       >
         <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 text-left">
-          <div className="flex flex-col md:flex-row md:items-baseline gap-4">
+          <div className="flex flex-col gap-1">
             <h2 className="text-3xl font-bold text-slate-800">
               Travel Products
             </h2>
@@ -187,12 +303,38 @@ export default function ProductsSection() {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            {selectedCount > 1 && (
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            {selectedCount > 0 && (
               <div className="flex items-center px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-sm font-semibold text-slate-600">
-                {selectedCount} items selected
+                {selectedCount} {selectedCount === 1 ? "item" : "items"}{" "}
+                selected
               </div>
             )}
+
+            {(selectedCount > 0 || filters) && (
+              <div className="relative" ref={exportDropdownRef}>
+                <button
+                  onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
+                  className="flex-shrink-0 flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-full text-slate-600 hover:text-green-600 hover:border-green-600 hover:bg-green-50 transition-colors cursor-pointer font-semibold text-sm"
+                  title="Export Data"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${isExportDropdownOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {isExportDropdownOpen && (
+                  <ExportDropdown
+                    selectedCount={selectedCount}
+                    hasFilters={!!filters}
+                    onExportClick={handleExportClick}
+                  />
+                )}
+              </div>
+            )}
+
             {selectedCount === 1 && (
               <button
                 onClick={handleEdit}
@@ -212,24 +354,60 @@ export default function ProductsSection() {
                 <Trash2 className="w-5 h-5" />
               </button>
             )}
-            <div className="relative w-full md:w-auto">
+
+            <div className="relative w-full order-last md:order-none md:w-auto">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Sparkles className="h-5 w-5 text-orange-500" />
+                <Sparkles className="h-5 w-5 text-primary-500" />
               </div>
               <input
                 type="text"
                 readOnly
                 onClick={() => setIsAiSearchOpen(true)}
-                placeholder="Search any product in your own words ..."
-                className="w-full md:w-80 lg:w-96 xl:w-[32rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                placeholder="Search any product in your own words..."
+                className="w-full md:w-[17rem] lg:w-[19rem] xl:w-[22rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all cursor-pointer"
               />
             </div>
+            <div className="relative" ref={columnDropdownRef}>
+              <button
+                onClick={() => setIsColumnDropdownOpen(!isColumnDropdownOpen)}
+                className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
+                  isColumnDropdownOpen
+                    ? "bg-primary-100 text-primary-600 border-primary-200"
+                    : "bg-white text-slate-600 border-slate-300 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50"
+                }`}
+                title="Toggle Columns"
+              >
+                <Columns className="w-5 h-5" />
+              </button>
+              {isColumnDropdownOpen && (
+                <ColumnVisibilityDropdown
+                  columns={columnOptions}
+                  visibility={columnVisibility}
+                  onToggle={(id) =>
+                    setColumnVisibility((prev) => ({
+                      ...prev,
+                      [id]: prev[id] === false ? true : false,
+                    }))
+                  }
+                />
+              )}
+            </div>
             <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              onClick={() => {
+                const newState = !isFilterOpen;
+                setIsFilterOpen(newState);
+                if (newState) {
+                  setTimeout(() => {
+                    document
+                      .getElementById("product-filter-container")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }, 100);
+                }
+              }}
               className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
                 isFilterOpen
-                  ? "bg-orange-100 text-orange-600 border-orange-200"
-                  : "bg-white text-slate-600 border-slate-300 hover:text-orange-600 hover:border-orange-300 hover:bg-orange-50"
+                  ? "bg-primary-100 text-primary-600 border-primary-200"
+                  : "bg-white text-slate-600 border-slate-300 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50"
               }`}
               title="Toggle Filters"
             >
@@ -237,19 +415,24 @@ export default function ProductsSection() {
             </button>
             <button
               onClick={handleCreate}
-              className="flex-shrink-0 flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
+              className="flex-shrink-0 flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm cursor-pointer"
             >
               <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Create Product</span>
+              <span>Create Product</span>
             </button>
           </div>
         </div>
-        <div className="w-full flex flex-col lg:flex-row gap-6 h-full min-h-[400px]">
+        <div className="w-full flex flex-col gap-6 h-full min-h-[400px]">
+          {/* Filter Inner Container */}
+          <ProductFilter
+            onFilter={onSubmit}
+            onReset={() => setFilters(null)}
+            className={isFilterOpen ? "flex" : "hidden"}
+            externalFilters={filters}
+          />
           {/* Products Table Inner Container */}
           <div
-            className={`w-full ${
-              isFilterOpen ? "lg:w-[80%]" : ""
-            } min-h-[65vh] border-2 border-orange-200/50 rounded-3xl p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
+            className={`w-full min-h-[65vh] rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <ProductsTable
               highlightedProductId={highlightedProductId}
@@ -258,15 +441,10 @@ export default function ProductsSection() {
               setRowSelection={setRowSelection}
               onRowClick={handleRowClick}
               filters={filters}
+              columnVisibility={columnVisibility}
+              onCreateProduct={handleCreate}
             />
           </div>
-          {/* Filter Inner Container */}
-          <ProductFilter
-            onFilter={onSubmit}
-            onReset={() => setFilters(null)}
-            className={isFilterOpen ? "flex" : "hidden"}
-            externalFilters={filters}
-          />
         </div>
       </section>
 
@@ -324,9 +502,15 @@ export default function ProductsSection() {
 
       <ViewProductModal
         isOpen={isViewModalOpen}
+        hideActions={returnToDeleteOnClose}
         onClose={() => {
           setIsViewModalOpen(false);
-          setProductToView(null);
+          if (returnToDeleteOnClose) {
+            setIsDeleteModalOpen(true);
+            setReturnToDeleteOnClose(false);
+          } else {
+            setProductToView(null);
+          }
         }}
         product={productToView}
         onEdit={(product) => {
@@ -341,6 +525,26 @@ export default function ProductsSection() {
           setRowSelection({ [product.productId]: true });
           setReturnToViewOnClose(true);
           setIsDeleteModalOpen(true);
+        }}
+        onExportPdf={async (product) => {
+          try {
+            await exportProductsPdf(
+              [product.productId],
+              null,
+              undefined,
+              "single",
+            );
+            setBanner({
+              type: "success",
+              message: "PDF document ready to download",
+            });
+          } catch (error) {
+            console.error("Error exporting PDF:", error);
+            setBanner({
+              type: "error",
+              message: "Failed to export product to PDF",
+            });
+          }
         }}
       />
     </>
