@@ -140,9 +140,15 @@ export default function ProductsSection() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ([, data]: any) => data?.products || [],
     );
-    return allProducts.filter((p: Product) =>
-      selectedIds.includes(p.productId),
-    );
+
+    const uniqueProductsMap = new Map<string, Product>();
+    allProducts.forEach((p: Product) => {
+      if (selectedIds.includes(p.productId)) {
+        uniqueProductsMap.set(p.productId, p);
+      }
+    });
+
+    return Array.from(uniqueProductsMap.values());
   };
 
   const handleDelete = () => {
