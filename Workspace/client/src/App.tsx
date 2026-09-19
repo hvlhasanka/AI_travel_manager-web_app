@@ -1,6 +1,6 @@
 import HeroSection from "@/components/hero/HeroSection";
 import ProductsSection from "@/components/product/ProductsSection";
-import Footer from "@/components/Footer";
+import Footer from "@/components/footer/Footer";
 
 function App() {
   return (
