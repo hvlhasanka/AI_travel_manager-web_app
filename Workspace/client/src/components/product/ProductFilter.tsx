@@ -132,20 +132,21 @@ export default function ProductFilter({
             type="range"
             min="0"
             max={MAX_PRICE}
-            {...register("maxPrice")}
+            value={maxPrice || 0}
+            onChange={(e) => setValue("maxPrice", Number(e.target.value))}
             className="w-full accent-primary-500 mb-1"
           />
           <div className="flex items-center gap-2">
             <input
               type="number"
-              {...register("minPrice")}
+              {...register("minPrice", { valueAsNumber: true })}
               placeholder="Min"
               className="w-1/2 px-2 py-1.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500"
             />
             <span className="text-slate-400">-</span>
             <input
               type="number"
-              {...register("maxPrice")}
+              {...register("maxPrice", { valueAsNumber: true })}
               placeholder="Max"
               className="w-1/2 px-2 py-1.5 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500"
             />
