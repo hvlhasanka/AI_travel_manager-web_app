@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Product } from "@/types/product.types";
 import FullscreenImageOverlay from "@/components/FullscreenImageOverlay";
 import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
+import placeholderImage from "@/assets/images/polaroid-black-photo.jpg";
 interface ViewProductModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -176,8 +177,15 @@ export default function ViewProductModal({
                     />
                   </div>
                 ) : (
-                  <div className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center bg-white text-slate-500 p-4 text-center">
-                    <span className="text-sm">No image available</span>
+                  <div className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center bg-white p-4 text-center">
+                    <img
+                      src={placeholderImage}
+                      alt="No image placeholder"
+                      className="w-3/5 object-contain mb-4 opacity-90 rounded-xl mix-blend-multiply"
+                    />
+                    <span className="text-sm text-slate-400 font-medium mb-1">
+                      Seems like there's no image
+                    </span>
                   </div>
                 )}
               </div>
