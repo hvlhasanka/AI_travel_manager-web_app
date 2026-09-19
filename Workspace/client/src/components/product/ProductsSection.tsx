@@ -422,6 +422,7 @@ export default function ProductsSection() {
               onRowClick={handleRowClick}
               filters={filters}
               columnVisibility={columnVisibility}
+              onCreateProduct={handleCreate}
             />
           </div>
           {/* Filter Inner Container */}

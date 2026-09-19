@@ -2,12 +2,13 @@ import { useTable, type RowSelectionState } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../../services/product.service";
 import type { Product } from "../../types/product.types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { FilterFormValues } from "./ProductFilter";
 import FullscreenImageOverlay from "./FullscreenImageOverlay";
 
 import { columns, features } from "./productsTableColumns";
+import emptyImage from "../../../assets/images/empty-suitcase.jpg";
 
 export default function ProductsTable({
   highlightedProductId,
@@ -17,6 +18,7 @@ export default function ProductsTable({
   onRowClick,
   filters,
   columnVisibility,
+  onCreateProduct,
 }: {
   highlightedProductId?: string | null;
   animatedProductId?: string | null;
@@ -25,6 +27,7 @@ export default function ProductsTable({
   onRowClick?: (product: Product) => void;
   filters?: FilterFormValues | null;
   columnVisibility?: Record<string, boolean>;
+  onCreateProduct?: () => void;
 }) {
   const [page, setPage] = useState(1);
   const [prevFilters, setPrevFilters] = useState(filters);
@@ -167,9 +170,33 @@ export default function ProductsTable({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-8 text-center text-slate-500"
+                  className="px-4 h-[45vh] align-middle border-b-0"
                 >
-                  No products found.
+                  <div className="flex flex-col items-center justify-center text-slate-500 sticky left-1/2 -translate-x-1/2 w-max">
+                    <img
+                      src={emptyImage}
+                      alt="Empty suitcase"
+                      className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 mb-4 object-contain transition-all duration-300"
+                    />
+                    <p className="text-sm text-slate-500 max-w-sm mb-1">
+                      Seems like there're no products
+                    </p>
+                    <p className="text-base font-semibold text-slate-800 mb-6">
+                      Let's create the first product
+                    </p>
+                    {onCreateProduct && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCreateProduct();
+                        }}
+                        className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
+                      >
+                        <Plus className="w-5 h-5" />
+                        Create Product
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ) : (
