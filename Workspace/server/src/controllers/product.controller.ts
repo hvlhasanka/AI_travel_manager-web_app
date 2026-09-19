@@ -106,7 +106,7 @@ export const aiSearchHandler = async (req: Request, res: Response) => {
 
               Example 2:
               User - "Show active family packages"
-              Output - {"category": "Family Package", "status": "Active"}
+              Output - {"category": "Family Package", "status": "ACTIVE"}
 
               Example 3:
               User - "Show products below LKR 10,000"
