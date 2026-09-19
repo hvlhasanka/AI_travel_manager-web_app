@@ -18,6 +18,13 @@ With full functionality across creating, editing, viewing, and deleting travel p
 
 ## 2. System Architecture
 
+<p align="center">
+  <kbd>
+    <img src="./Documentation/system-architecture.png" />
+  </kbd>
+</p>
+<p align="center">Figure 2.1: System Architecture Diagram</p>
+
 - **Frontend**: React (Vite), Tailwind CSS v4, TanStack Query (React Query), TanStack Table (React Table), `react-hook-form`, `lucide-react`
 - **Backend**: Node.js, Express, Prisma ORM, `express-rate-limit`, `zod` schema validation, and OpenAI API integration
 - **Database**: PostgreSQL
