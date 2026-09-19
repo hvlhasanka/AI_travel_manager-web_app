@@ -1,4 +1,5 @@
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, ArrowDown } from "lucide-react";
+import placeholderImage from "@/assets/images/polaroid-black-photo.jpg";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -270,7 +271,11 @@ export default function CreateEditProductModal({
               <button
                 type="button"
                 onClick={handleClose}
-                disabled={isImageGenerating}
+                disabled={
+                  isImageGenerating ||
+                  createMutation.isPending ||
+                  updateMutation.isPending
+                }
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors -mr-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X className="w-5 h-5" />
@@ -529,7 +534,7 @@ export default function CreateEditProductModal({
                   Product Image
                 </h3>
                 <div className="flex flex-col gap-4">
-                  <div className="w-full">
+                  <div className="w-48 sm:w-64 md:w-full mx-auto">
                     {watch("imageUrl") ? (
                       <div className="relative w-full aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm group">
                         <img
@@ -550,8 +555,19 @@ export default function CreateEditProductModal({
                         </button>
                       </div>
                     ) : (
-                      <div className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center bg-white text-slate-500 p-4 text-center">
-                        <span className="text-sm">No image</span>
+                      <div className="w-full aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center bg-white p-4 text-center">
+                        <img
+                          src={placeholderImage}
+                          alt="No image placeholder"
+                          className="w-3/5 object-contain mb-4 opacity-90 rounded-xl mix-blend-multiply"
+                        />
+                        <span className="text-sm text-slate-400 font-medium mb-1">
+                          Seems like there's no image
+                        </span>
+                        <span className="text-sm font-semibold text-primary-600 mb-2">
+                          We can generate an image
+                        </span>
+                        <ArrowDown className="w-5 h-5 text-primary-600 animate-bounce" />
                       </div>
                     )}
                   </div>
@@ -581,7 +597,11 @@ export default function CreateEditProductModal({
               <button
                 type="button"
                 onClick={handleClose}
-                disabled={isImageGenerating}
+                disabled={
+                  isImageGenerating ||
+                  createMutation.isPending ||
+                  updateMutation.isPending
+                }
                 className="px-6 py-2.5 font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 Cancel

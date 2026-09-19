@@ -45,14 +45,16 @@ export default function Banner({
       onAnimationEnd={handleAnimationEnd}
     >
       <div
-        className={`relative px-4 py-5 flex items-center justify-center gap-3 border rounded-xl shadow-lg ${isSuccess ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"}`}
+        className={`relative px-4 py-5 flex items-center justify-center gap-3 rounded-xl shadow-lg ${isSuccess ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
       >
         {isSuccess ? (
           <CheckCircle2 className="w-5 h-5 shrink-0" />
         ) : (
           <AlertCircle className="w-5 h-5 shrink-0" />
         )}
-        <span className="font-medium text-lg">{message}</span>
+        <span className="font-medium text-sm sm:text-base md:text-lg text-center pr-6 sm:pr-0">
+          {message}
+        </span>
         <button
           onClick={handleClose}
           className={`absolute right-4 p-1 rounded-md transition-colors ${isSuccess ? "hover:bg-green-100" : "hover:bg-red-100"}`}

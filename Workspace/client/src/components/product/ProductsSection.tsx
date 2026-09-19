@@ -278,7 +278,7 @@ export default function ProductsSection() {
       )}
       <section
         id="products-section"
-        className="w-full flex-1 bg-white rounded-2xl min-[1090px]:rounded-[3rem] shadow-sm border border-slate-200 flex flex-col items-center py-6 px-4 min-[1090px]:py-16 min-[1090px]:px-16 min-[1600px]:px-[5%] text-center"
+        className="w-full flex-1 bg-white rounded-2xl min-[1090px]:rounded-[3rem] shadow-sm flex flex-col items-center py-6 px-4 min-[1090px]:py-16 min-[1090px]:px-16 min-[1600px]:px-[5%] text-center"
       >
         <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 text-left">
           <div className="flex flex-col gap-1">
@@ -419,7 +419,7 @@ export default function ProductsSection() {
           />
           {/* Products Table Inner Container */}
           <div
-            className={`w-full min-h-[65vh] border-2 border-primary-200/50 rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
+            className={`w-full min-h-[65vh] rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
           >
             <ProductsTable
               highlightedProductId={highlightedProductId}
