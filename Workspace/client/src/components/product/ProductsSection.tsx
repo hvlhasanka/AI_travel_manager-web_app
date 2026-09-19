@@ -1,14 +1,14 @@
-import ProductsTable from "./ProductsTable";
-import { columns as tableColumns } from "./productsTableColumns";
-import CreateEditProductModal from "./CreateEditProductModal";
-import ViewProductModal from "./ViewProductModal";
-import AiOverlay from "./AiOverlay";
-import ProductFilter, { type FilterFormValues } from "./ProductFilter";
-import ExportDropdown from "./ExportDropdown";
-import ExportLoadingOverlay from "./ExportLoadingOverlay";
+import ProductsTable from "@/components/product/ProductsTable";
+import { columns as tableColumns } from "@/components/product/productsTableColumns";
+import CreateEditProductModal from "@/components/product/CreateEditProductModal";
+import ViewProductModal from "@/components/product/ViewProductModal";
+import AiOverlay from "@/components/product/AiOverlay";
+import ProductFilter, { type FilterFormValues } from "@/components/product/ProductFilter";
+import ExportDropdown from "@/components/product/ExportDropdown";
+import ExportLoadingOverlay from "@/components/product/ExportLoadingOverlay";
 import ColumnVisibilityDropdown, {
   type ColumnOption,
-} from "./ColumnVisibilityDropdown";
+} from "@/components/product/ColumnVisibilityDropdown";
 import {
   Plus,
   Sparkles,
@@ -19,9 +19,9 @@ import {
   ChevronDown,
   Columns,
 } from "lucide-react";
-import { MAX_PRICE } from "../../constants";
+import { MAX_PRICE } from "@/constants";
 import { useState, useRef, useEffect, useMemo } from "react";
-import Banner from "../Banner";
+import Banner from "@/components/Banner";
 import { type RowSelectionState } from "@tanstack/react-table";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -29,9 +29,9 @@ import {
   aiSearchProducts,
   exportProducts,
   exportProductsPdf,
-} from "../../services/product.service";
-import DeleteConfirmModal from "./DeleteConfirmModal";
-import type { Product } from "../../types/product.types";
+} from "@/services/product.service";
+import DeleteConfirmModal from "@/components/product/DeleteConfirmModal";
+import type { Product } from "@/types/product.types";
 
 export default function ProductsSection() {
   const [isAiSearchOpen, setIsAiSearchOpen] = useState(false);

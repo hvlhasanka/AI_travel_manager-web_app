@@ -1,7 +1,7 @@
 import { Sparkles, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import DiscardConfirmModal from "./DiscardConfirmModal";
+import DiscardConfirmModal from "@/components/product/DiscardConfirmModal";
 
 interface AiOverlayProps {
   isOpen: boolean;

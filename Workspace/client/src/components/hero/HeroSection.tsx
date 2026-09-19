@@ -1,7 +1,7 @@
-import heroCoverImage from "../../assets/images/hero-cover-image.jpg";
-import StatCardSection from "./StatCardSection";
-import BrowseProductsButton from "./BrowseProductsButton";
-import HeroHeader from "./HeroHeader";
+import heroCoverImage from "@/assets/images/hero-cover-image.jpg";
+import StatCardSection from "@/components/hero/StatCardSection";
+import BrowseProductsButton from "@/components/hero/BrowseProductsButton";
+import HeroHeader from "@/components/hero/HeroHeader";
 
 export default function HeroSection() {
   return (

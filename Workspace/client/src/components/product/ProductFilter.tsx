@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { MAX_PRICE } from "../../constants";
+import { MAX_PRICE } from "@/constants";
 
 export type FilterFormValues = {
   product: string;

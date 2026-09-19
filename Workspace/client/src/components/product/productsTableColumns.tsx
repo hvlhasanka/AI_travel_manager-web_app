@@ -4,7 +4,7 @@ import {
   rowSelectionFeature,
 } from "@tanstack/react-table";
 import { Image as ImageIcon } from "lucide-react";
-import type { Product } from "../../types/product.types";
+import type { Product } from "@/types/product.types";
 
 export const features = tableFeatures({ rowSelectionFeature });
 const helper = createColumnHelper<typeof features, Product>();

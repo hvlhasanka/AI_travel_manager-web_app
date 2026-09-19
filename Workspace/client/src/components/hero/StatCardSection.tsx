@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import StatCard from "./StatCard";
-import Banner from "../Banner";
+import StatCard from "@/components/hero/StatCard";
+import Banner from "@/components/Banner";
 
-import { fetchStats } from "../../services/product.service";
+import { fetchStats } from "@/services/product.service";
 
 function StatCardSkeleton({ hasBadge = false }: { hasBadge?: boolean }) {
   return (

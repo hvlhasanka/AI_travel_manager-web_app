@@ -2,9 +2,9 @@ import type {
   Product,
   ProductStats,
   GetProductsResponse,
-} from "../types/product.types";
-import type { FilterFormValues } from "../components/product/ProductFilter";
-import { MAX_PRICE } from "../constants";
+} from "@/types/product.types";
+import type { FilterFormValues } from "@/components/product/ProductFilter";
+import { MAX_PRICE } from "@/constants";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 

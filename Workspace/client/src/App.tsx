@@ -1,5 +1,5 @@
-import HeroSection from "./components/hero/HeroSection";
-import ProductsSection from "./components/product/ProductsSection";
+import HeroSection from "@/components/hero/HeroSection";
+import ProductsSection from "@/components/product/ProductsSection";
 
 function App() {
   return (

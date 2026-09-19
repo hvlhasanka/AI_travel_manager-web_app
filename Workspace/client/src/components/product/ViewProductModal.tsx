@@ -1,8 +1,8 @@
 import { X, Pencil, Trash2, FileText } from "lucide-react";
 import { useState } from "react";
-import type { Product } from "../../types/product.types";
-import FullscreenImageOverlay from "./FullscreenImageOverlay";
-import ExportLoadingOverlay from "./ExportLoadingOverlay";
+import type { Product } from "@/types/product.types";
+import FullscreenImageOverlay from "@/components/product/FullscreenImageOverlay";
+import ExportLoadingOverlay from "@/components/product/ExportLoadingOverlay";
 interface ViewProductModalProps {
   isOpen: boolean;
   onClose: () => void;

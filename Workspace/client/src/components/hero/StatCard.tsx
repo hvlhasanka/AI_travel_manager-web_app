@@ -1,4 +1,4 @@
-import StatBadge from "./StatBadge";
+import StatBadge from "@/components/hero/StatBadge";
 
 interface StatCardProps {
   value: string | number;

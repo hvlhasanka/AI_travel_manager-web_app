@@ -1,14 +1,14 @@
 import { useTable, type RowSelectionState } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProducts } from "../../services/product.service";
-import type { Product } from "../../types/product.types";
+import { fetchProducts } from "@/services/product.service";
+import type { Product } from "@/types/product.types";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
-import type { FilterFormValues } from "./ProductFilter";
-import FullscreenImageOverlay from "./FullscreenImageOverlay";
+import type { FilterFormValues } from "@/components/product/ProductFilter";
+import FullscreenImageOverlay from "@/components/product/FullscreenImageOverlay";
 
-import { columns, features } from "./productsTableColumns";
-import emptyImage from "../../assets/images/empty-suitcase.jpg";
+import { columns, features } from "@/components/product/productsTableColumns";
+import emptyImage from "@/assets/images/empty-suitcase.jpg";
 
 export default function ProductsTable({
   highlightedProductId,

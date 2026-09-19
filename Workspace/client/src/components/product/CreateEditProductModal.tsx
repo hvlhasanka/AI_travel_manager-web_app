@@ -7,13 +7,13 @@ import {
   updateProduct,
   aiGenerateProduct,
   aiGenerateImage,
-} from "../../services/product.service";
-import AiOverlay from "./AiOverlay";
-import FullscreenImageOverlay from "./FullscreenImageOverlay";
-import DiscardConfirmModal from "./DiscardConfirmModal";
+} from "@/services/product.service";
+import AiOverlay from "@/components/product/AiOverlay";
+import FullscreenImageOverlay from "@/components/product/FullscreenImageOverlay";
+import DiscardConfirmModal from "@/components/product/DiscardConfirmModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import type { Product } from "../../types/product.types";
+import type { Product } from "@/types/product.types";
 
 export type CreateEditProductModalData = {
   productId?: string;
