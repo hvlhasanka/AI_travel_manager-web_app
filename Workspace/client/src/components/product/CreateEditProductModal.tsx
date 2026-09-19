@@ -1,5 +1,5 @@
 import { X, Sparkles, ArrowDown } from "lucide-react";
-import placeholderImage from "@/assets/images/polaroid-black-photo.jpg";
+import placeholderImage from "@/assets/images/polaroid-white-photo.jpg";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

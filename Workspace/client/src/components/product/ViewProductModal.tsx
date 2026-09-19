@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { Product } from "@/types/product.types";
 import FullscreenImageOverlay from "@/components/FullscreenImageOverlay";
 import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
-import placeholderImage from "@/assets/images/polaroid-black-photo.jpg";
+import placeholderImage from "@/assets/images/polaroid-white-photo.jpg";
 interface ViewProductModalProps {
   isOpen: boolean;
   onClose: () => void;
