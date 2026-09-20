@@ -1,3 +1,4 @@
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 interface ExportLoadingOverlayProps {
   isOpen: boolean;
 }
@@ -5,6 +6,7 @@ interface ExportLoadingOverlayProps {
 export default function ExportLoadingOverlay({
   isOpen,
 }: ExportLoadingOverlayProps) {
+  useBodyScrollLock(isOpen);
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300">

@@ -1,3 +1,4 @@
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 interface DiscardConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,6 +18,7 @@ export default function DiscardConfirmModal({
   cancelText = "Cancel",
   confirmText = "Discard",
 }: DiscardConfirmModalProps) {
+  useBodyScrollLock(isOpen);
   return (
     <div
       className={`fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 transition-all duration-300 ease-out ${

@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 interface FullscreenImageOverlayProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export default function FullscreenImageOverlay({
   imageUrl: incomingImageUrl,
   onClose,
 }: FullscreenImageOverlayProps) {
+  useBodyScrollLock(isOpen);
   const [localImageUrl, setLocalImageUrl] = useState<string | null>(
     incomingImageUrl,
   );

@@ -1,4 +1,5 @@
 import type { Product } from "@/types/product.types";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 interface DeleteConfirmModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function DeleteConfirmModal({
   isPending,
   onRowClick,
 }: DeleteConfirmModalProps) {
+  useBodyScrollLock(isOpen);
   return (
     <div
       className={`fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 transition-all duration-300 ease-out ${
