@@ -1,5 +1,5 @@
 import { Sparkles, X, ArrowRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import DiscardConfirmModal from "@/components/product/DiscardConfirmModal";
 import PoweredByOpenAi from "@/components/product/PoweredByOpenAi";
@@ -16,6 +16,7 @@ interface AiOverlayProps {
   discardTitle: string;
   discardDescription: string;
   isLoading?: boolean;
+  initialQuery?: string;
 }
 
 type AiFormData = {
@@ -33,6 +34,7 @@ export default function AiOverlay({
   discardTitle,
   discardDescription,
   isLoading = false,
+  initialQuery = "",
 }: AiOverlayProps) {
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [bannerMsg, setBannerMsg] = useState<string | null>(null);
@@ -46,25 +48,24 @@ export default function AiOverlay({
     reset,
     formState: { errors },
   } = useForm<AiFormData>({
-    defaultValues: { query: "" },
+    defaultValues: { query: initialQuery },
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const aiQuery = watch("query");
 
-  // Reset query when closed
+  // Reset query when opened
   useEffect(() => {
-    if (!isOpen) {
-      reset({ query: "" });
+    if (isOpen) {
+      reset({ query: initialQuery });
+    } else {
       setShowDiscardConfirm(false);
       setBannerMsg(null);
     }
-  }, [isOpen, reset]);
-
-  if (!isOpen) return null;
+  }, [isOpen, initialQuery, reset]);
 
   const handleClose = () => {
-    if (aiQuery && aiQuery.trim().length > 0) {
+    if (aiQuery && aiQuery.trim().length > 0 && aiQuery !== initialQuery) {
       setShowDiscardConfirm(true);
     } else {
       onClose();
@@ -84,11 +85,27 @@ export default function AiOverlay({
 
   // We need to extract the register props to add our own focus handlers
   const {
-    ref: queryRef,
+    ref: queryRegisterRef,
     onChange: queryOnChange,
     onBlur: queryOnBlur,
     ...queryRest
   } = register("query", { required: true });
+
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const queryRef = (e: HTMLTextAreaElement | null) => {
+    queryRegisterRef(e);
+    inputRef.current = e;
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   return (
     <>
@@ -100,7 +117,13 @@ export default function AiOverlay({
           onClose={() => setBannerMsg(null)}
         />
       )}
-      <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all">
+      <div
+        className={`fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all duration-300 ease-out ${
+          isOpen
+            ? "opacity-100 visible"
+            : "opacity-0 invisible pointer-events-none"
+        }`}
+      >
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -114,7 +137,11 @@ export default function AiOverlay({
 
         <form
           onSubmit={handleSubmit(handleFormSubmit, handleFormError)}
-          className="w-full flex flex-col items-center"
+          className={`w-full flex flex-col items-center transition-all duration-300 ease-out delay-75 ${
+            isOpen
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-8 scale-95"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="w-full max-w-3xl mb-6">
@@ -133,7 +160,6 @@ export default function AiOverlay({
               <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary-500" />
             </div>
             <textarea
-              autoFocus
               ref={queryRef}
               onChange={queryOnChange}
               onBlur={queryOnBlur}

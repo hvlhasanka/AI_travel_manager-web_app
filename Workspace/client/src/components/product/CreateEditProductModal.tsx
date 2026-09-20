@@ -82,6 +82,7 @@ export default function CreateEditProductModal({
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isFullscreenImageOpen, setIsFullscreenImageOpen] = useState(false);
+  const [lastAiGenerateQuery, setLastAiGenerateQuery] = useState("");
 
   const {
     register,
@@ -128,6 +129,7 @@ export default function CreateEditProductModal({
   };
 
   const handleAiGenerate = async (query: string) => {
+    setLastAiGenerateQuery(query);
     setIsAiGenerating(true);
     try {
       const generated = await aiGenerateProduct(query);
@@ -206,12 +208,10 @@ export default function CreateEditProductModal({
   useEffect(() => {
     if (isOpen) {
       reset(getDefaultValues(product));
-
+      setLastAiGenerateQuery("");
       setShowDiscardConfirm(false);
     }
   }, [isOpen, product, reset]);
-
-  if (!isOpen) return null;
 
   const isEdit = !!product;
 
@@ -247,9 +247,19 @@ export default function CreateEditProductModal({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all duration-300 ease-out ${
+          isOpen
+            ? "opacity-100 visible"
+            : "opacity-0 invisible pointer-events-none"
+        }`}
+      >
         <div
-          className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl animate-slide-down flex flex-col"
+          className={`bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col transition-all duration-300 ease-out delay-75 ${
+            isOpen
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-8 scale-95"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-100">
@@ -641,6 +651,7 @@ export default function CreateEditProductModal({
       <AiOverlay
         isOpen={isAiGenerateOpen}
         onClose={() => setIsAiGenerateOpen(false)}
+        initialQuery={lastAiGenerateQuery}
         title="Describe the new product in your own words..."
         buttonText="Generate"
         loadingButtonText="Generating..."
@@ -656,12 +667,11 @@ export default function CreateEditProductModal({
         discardDescription="You have entered a product prompt. Are you sure you want to discard it?"
       />
 
-      {isFullscreenImageOpen && watch("imageUrl") && (
-        <FullscreenImageOverlay
-          imageUrl={watch("imageUrl") as string}
-          onClose={() => setIsFullscreenImageOpen(false)}
-        />
-      )}
+      <FullscreenImageOverlay
+        isOpen={isFullscreenImageOpen}
+        imageUrl={(watch("imageUrl") as string) || null}
+        onClose={() => setIsFullscreenImageOpen(false)}
+      />
     </>
   );
 }
