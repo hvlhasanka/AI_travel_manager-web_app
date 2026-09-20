@@ -20,6 +20,7 @@ export default function ProductsTable({
   filters,
   columnVisibility,
   onCreateProduct,
+  onTotalCountChange,
 }: {
   highlightedProductId?: string | null;
   animatedProductId?: string | null;
@@ -29,6 +30,7 @@ export default function ProductsTable({
   filters?: FilterFormValues | null;
   columnVisibility?: Record<string, boolean>;
   onCreateProduct?: () => void;
+  onTotalCountChange?: (count: number) => void;
 }) {
   const [page, setPage] = useState(1);
   const [prevFilters, setPrevFilters] = useState(filters);
@@ -72,6 +74,10 @@ export default function ProductsTable({
 
   const totalCount = data?.totalCount || 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
+  useEffect(() => {
+    onTotalCountChange?.(totalCount);
+  }, [totalCount, onTotalCountChange]);
 
   const table = useTable({
     data: data?.products || [],

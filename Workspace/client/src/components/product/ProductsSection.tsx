@@ -108,6 +108,7 @@ export default function ProductsSection() {
   const [animatedProductId, setAnimatedProductId] = useState<string | null>(
     null,
   );
+  const [totalCount, setTotalCount] = useState(0);
 
   const queryClient = useQueryClient();
 
@@ -225,6 +226,15 @@ export default function ProductsSection() {
     }
   };
 
+  const hasActiveFilters = filters
+    ? filters.product !== "" ||
+      filters.destination !== "" ||
+      filters.category !== "" ||
+      filters.minPrice !== 0 ||
+      filters.maxPrice !== MAX_PRICE ||
+      filters.status !== "ALL"
+    : false;
+
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportClick = async (
@@ -311,7 +321,7 @@ export default function ProductsSection() {
               </div>
             )}
 
-            {(selectedCount > 0 || filters) && (
+            {totalCount > 0 && (
               <div className="relative" ref={exportDropdownRef}>
                 <button
                   onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
@@ -328,7 +338,7 @@ export default function ProductsSection() {
                 {isExportDropdownOpen && (
                   <ExportDropdown
                     selectedCount={selectedCount}
-                    hasFilters={!!filters}
+                    hasFilters={hasActiveFilters}
                     onExportClick={handleExportClick}
                   />
                 )}
@@ -426,7 +436,13 @@ export default function ProductsSection() {
           {/* Filter Inner Container */}
           <ProductFilter
             onFilter={onSubmit}
-            onReset={() => setFilters(null)}
+            onReset={() => {
+              setFilters(null);
+              setBanner({
+                type: "success",
+                message: "Filter reset successful",
+              });
+            }}
             className={isFilterOpen ? "flex" : "hidden"}
             externalFilters={filters}
           />
@@ -443,6 +459,7 @@ export default function ProductsSection() {
               filters={filters}
               columnVisibility={columnVisibility}
               onCreateProduct={handleCreate}
+              onTotalCountChange={setTotalCount}
             />
           </div>
         </div>

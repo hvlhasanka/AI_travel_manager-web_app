@@ -38,28 +38,26 @@ export default function ExportDropdown({
           </button>
         </>
       )}
-      {hasFilters && (
-        <>
-          <button
-            onClick={() => onExportClick("filtered", "excel")}
-            className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors ${selectedCount > 0 ? "border-t border-slate-100" : ""}`}
-          >
-            <FileSpreadsheet className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-semibold text-slate-700">
-              Excel (Filter Results)
-            </span>
-          </button>
-          <button
-            onClick={() => onExportClick("filtered", "pdf")}
-            className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
-          >
-            <FileText className="w-5 h-5 text-red-600" />
-            <span className="text-sm font-semibold text-slate-700">
-              PDF (Filter Results)
-            </span>
-          </button>
-        </>
-      )}
+      <>
+        <button
+          onClick={() => onExportClick("filtered", "excel")}
+          className={`w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors ${selectedCount > 0 ? "border-t border-slate-100" : ""}`}
+        >
+          <FileSpreadsheet className="w-5 h-5 text-green-600" />
+          <span className="text-sm font-semibold text-slate-700">
+            Excel ({hasFilters ? "Filter Results" : "All Products"})
+          </span>
+        </button>
+        <button
+          onClick={() => onExportClick("filtered", "pdf")}
+          className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-slate-50 transition-colors"
+        >
+          <FileText className="w-5 h-5 text-red-600" />
+          <span className="text-sm font-semibold text-slate-700">
+            PDF ({hasFilters ? "Filter Results" : "All Products"})
+          </span>
+        </button>
+      </>
     </div>
   );
 }

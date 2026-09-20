@@ -66,7 +66,14 @@ export default function ProductFilter({
           <button
             type="button"
             onClick={() => {
-              reset();
+              reset({
+                product: "",
+                destination: "",
+                category: "",
+                minPrice: 0,
+                maxPrice: MAX_PRICE,
+                status: "ALL",
+              });
               onReset?.();
             }}
             className="text-sm font-semibold text-slate-500 hover:text-primary-600 transition-colors cursor-pointer"
