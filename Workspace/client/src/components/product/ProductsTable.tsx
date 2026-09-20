@@ -302,12 +302,11 @@ export default function ProductsTable({
         </div>
       )}
 
-      {fullscreenImageUrl && (
-        <FullscreenImageOverlay
-          imageUrl={fullscreenImageUrl}
-          onClose={() => setFullscreenImageUrl(null)}
-        />
-      )}
+      <FullscreenImageOverlay
+        isOpen={!!fullscreenImageUrl}
+        imageUrl={fullscreenImageUrl}
+        onClose={() => setFullscreenImageUrl(null)}
+      />
     </div>
   );
 }

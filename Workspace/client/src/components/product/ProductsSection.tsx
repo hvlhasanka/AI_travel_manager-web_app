@@ -183,6 +183,7 @@ export default function ProductsSection() {
 
   const [filters, setFilters] = useState<FilterFormValues | null>(null);
   const [isAiSearching, setIsAiSearching] = useState(false);
+  const [lastAiQuery, setLastAiQuery] = useState("");
 
   const onSubmit = (data: FilterFormValues) => {
     setFilters(data);
@@ -190,6 +191,7 @@ export default function ProductsSection() {
 
   const handleAiSearch = async (query: string) => {
     setIsAiSearching(true);
+    setLastAiQuery(query);
     try {
       const response = await aiSearchProducts(query);
 
@@ -372,9 +374,10 @@ export default function ProductsSection() {
               <input
                 type="text"
                 readOnly
+                value={lastAiQuery}
                 onClick={() => setIsAiSearchOpen(true)}
                 placeholder="Search any product in your own words..."
-                className="w-full md:w-[17rem] lg:w-[19rem] xl:w-[22rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all cursor-pointer"
+                className="w-full md:w-[17rem] lg:w-[19rem] xl:w-[22rem] pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all cursor-pointer truncate"
               />
             </div>
             <div className="relative" ref={columnDropdownRef}>
@@ -438,6 +441,7 @@ export default function ProductsSection() {
             onFilter={onSubmit}
             onReset={() => {
               setFilters(null);
+              setLastAiQuery("");
               setBanner({
                 type: "success",
                 message: "Filter reset successful",
@@ -478,6 +482,7 @@ export default function ProductsSection() {
         ]}
         onSubmit={handleAiSearch}
         isLoading={isAiSearching}
+        initialQuery={lastAiQuery}
         discardTitle="Discard query?"
         discardDescription="You have entered a search query. Are you sure you want to discard it?"
       />

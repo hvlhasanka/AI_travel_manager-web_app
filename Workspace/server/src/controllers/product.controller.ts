@@ -786,14 +786,14 @@ const exportProductsPdfSingle = async (
       .fontSize(9)
       .font("Helvetica")
       .fillColor("#94a3b8")
-      .text(`Created At: ${formattedCreatedAt}`, 40, footerY, {
+      .text(`Created at: ${formattedCreatedAt}`, 40, footerY, {
         lineBreak: false,
       });
     doc
       .fontSize(9)
       .font("Helvetica")
       .fillColor("#94a3b8")
-      .text(`Last Updated At: ${formattedUpdatedAt}`, 40, footerY, {
+      .text(`Last updated at: ${formattedUpdatedAt}`, 40, footerY, {
         align: "right",
         lineBreak: false,
         width: 515,

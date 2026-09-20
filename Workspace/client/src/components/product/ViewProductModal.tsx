@@ -1,5 +1,5 @@
 import { X, Pencil, Trash2, FileText } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Product } from "@/types/product.types";
 import FullscreenImageOverlay from "@/components/FullscreenImageOverlay";
 import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
@@ -17,7 +17,7 @@ interface ViewProductModalProps {
 export default function ViewProductModal({
   isOpen,
   onClose,
-  product,
+  product: incomingProduct,
   onEdit,
   onDelete,
   onExportPdf,
@@ -25,27 +25,48 @@ export default function ViewProductModal({
 }: ViewProductModalProps) {
   const [isFullscreenImageOpen, setIsFullscreenImageOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [localProduct, setLocalProduct] = useState<Product | null>(
+    incomingProduct,
+  );
 
-  if (!isOpen || !product) return null;
+  useEffect(() => {
+    if (incomingProduct) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLocalProduct(incomingProduct);
+    }
+  }, [incomingProduct]);
 
   const handleExportPdf = async () => {
+    if (!localProduct) return;
     setIsExporting(true);
     try {
-      await onExportPdf(product);
+      await onExportPdf(localProduct);
     } finally {
       setIsExporting(false);
     }
   };
 
+  if (!localProduct) return null;
+
+  const product = localProduct;
+
   return (
     <>
       <ExportLoadingOverlay isOpen={isExporting} />
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6 transition-opacity duration-300"
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6 transition-all duration-300 ease-out ${
+          isOpen
+            ? "opacity-100 visible"
+            : "opacity-0 invisible pointer-events-none"
+        }`}
         onClick={onClose}
       >
         <div
-          className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden animate-slide-down"
+          className={`bg-white rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[90vh] overflow-hidden transition-all duration-300 ease-out delay-75 ${
+            isOpen
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-8 scale-95"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -252,12 +273,11 @@ export default function ViewProductModal({
         </div>
       </div>
 
-      {isFullscreenImageOpen && product.imageUrl && (
-        <FullscreenImageOverlay
-          imageUrl={product.imageUrl}
-          onClose={() => setIsFullscreenImageOpen(false)}
-        />
-      )}
+      <FullscreenImageOverlay
+        isOpen={isFullscreenImageOpen}
+        imageUrl={product.imageUrl || null}
+        onClose={() => setIsFullscreenImageOpen(false)}
+      />
     </>
   );
 }
