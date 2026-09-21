@@ -7,7 +7,7 @@
 </p>
 <p align="center">Figure 0.1: Main User Interface</p>
 
-<hr />
+<hr /></br>
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/c8a84284-0853-4c74-90f1-5d9c7903b5a6/deploy-status)](https://app.netlify.com/projects/lucaslhh-travel-manager/deploys) https://lucaslhh-travel-manager.netlify.app</br>
 ![Render](https://img.shields.io/badge/API-Render-4EA674?logo=render&logoColor=white)
