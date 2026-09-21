@@ -1,5 +1,14 @@
 # AI Travel Manager Web App
 
+<p align="center">
+  <kbd>
+    <img src="./Documentation/main-user-interface.png" width="50%" />
+  </kbd>
+</p>
+<p align="center">Figure 0.1: Main User Interface</p>
+
+<hr />
+
 [![Netlify Status](https://api.netlify.com/api/v1/badges/c8a84284-0853-4c74-90f1-5d9c7903b5a6/deploy-status)](https://app.netlify.com/projects/lucaslhh-travel-manager/deploys) https://lucaslhh-travel-manager.netlify.app</br>
 ![Render](https://img.shields.io/badge/API-Render-4EA674?logo=render&logoColor=white)
 https://ai-travel-manager-web-app.onrender.com</br>
@@ -20,21 +29,93 @@ With full functionality across creating, editing, viewing, and deleting travel p
 7. **Dashboard Stats** - View statistics of all travel products.
 8. **Responsive UI** - Mobile responsive UI for seamless usage across devices.
 
-## 2. System Architecture
+## 2. Application Walkthroughs
+
+### Create Product
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/95cb45d2-973d-46e2-b45f-ac4bfcd0f41d" controls></video>
+</div>
+<p align="center">Figure 2.1: Create Product</p>
+
+### Export Product Details to PDF from View Product Modal
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/cb4ac1fc-6d9d-4b8e-ac3a-a9d22bae6cec" controls></video>
+</div>
+<p align="center">Figure 2.2: Export Product Details to PDF from View Product Modal</p>
+
+### Edit Product Details from View Product Modal
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/95d4ce57-969e-415b-b806-45a914000e18" controls></video>
+</div>
+<p align="center">Figure 2.3: Edit Product Details from View Product Modal</p>
+
+### Delete Product from View Product Modal
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/749ebdc0-ca01-4174-b504-09e563f4c414" controls></video>
+</div>
+<p align="center">Figure 2.4: Delete Product from View Product Modal</p>
+
+### Search Product with AI
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/930a1350-59b5-4ed7-a4e4-4eec5ed43504" controls></video>
+</div>
+<p align="center">Figure 2.5: Search Product with AI</p>
+
+### Export Filter Results to Excel
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/662f2392-6de5-487d-a028-06281c42bfe9" controls></video>
+</div>
+<p align="center">Figure 2.6: Export Filter Results to Excel</p>
+
+### Export Filter Results to PDF
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/0b556e68-9a89-4b0a-8cf7-5e4fdf86f034" controls></video>
+</div>
+<p align="center">Figure 2.7: Export Filter Results to PDF</p>
+
+### Edit Product Details from Product Table
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/e322395d-3154-41f5-99ea-79a77d480729" controls></video>
+</div>
+<p align="center">Figure 2.8: Edit Product Details from Product Table</p>
+
+### Delete Product from Product Table
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/2ec85c10-a25b-49e4-bdc0-7263b7a0ddd9" controls></video>
+</div>
+<p align="center">Figure 2.9: Delete Product from Product Table</p>
+
+### Product Expiration
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/4eb58bd9-3dce-4e53-8af3-dbc3efd816e0" controls></video>
+</div>
+<p align="center">Figure 2.10: Product Expiration</p>
+
+## 3. System Architecture
 
 <p align="center">
   <kbd>
     <img src="./Documentation/system-architecture.png" />
   </kbd>
 </p>
-<p align="center">Figure 2.1: System Architecture Diagram</p>
+<p align="center">Figure 3.1: System Architecture Diagram</p>
 
 - **Frontend**: React (Vite), Tailwind CSS v4, TanStack Query (React Query), TanStack Table (React Table), `react-hook-form`, `lucide-react`
 - **Backend**: Node.js, Express, Prisma ORM, `express-rate-limit`, `zod` schema validation, and OpenAI API integration
 - **Database**: PostgreSQL
 - **Media Storage**: Cloudinary
 
-## 3. Installation
+## 4. Installation
 
 Requires Node 20+.
 
@@ -85,9 +166,9 @@ cd Workspace/client
 npm run dev    # http://localhost:5173
 ```
 
-## 4. Usage
+## 5. Usage
 
-### 4.1. Non-functional Features
+### 5.1. Non-functional Features
 
 - **AI Integration** -
     - Leverages OpenAI for product search, generative product creation, and image generation.
@@ -103,7 +184,7 @@ npm run dev    # http://localhost:5173
 - **UI Responsiveness** -
     - The UI components and Tailwind layouts seamlessly handle various screen sizes.
 
-### 4.2. Functional Features
+### 5.2. Functional Features
 
 - **Manage Travel Products** -
     - Add new travel products by providing details like destination, category, price, and validity.
@@ -122,9 +203,9 @@ npm run dev    # http://localhost:5173
 - **Dashboard Statistics** -
     - Get an overview of the number of products in the inventory.
 
-## 5. Source Code Structure
+## 6. Source Code Structure
 
-### 5.1. Frontend (Client) Source Code
+### 6.1. Frontend (Client) Source Code
 
 The `src` directory contains the core frontend application code, structured as follows:
 
@@ -136,7 +217,7 @@ The `src` directory contains the core frontend application code, structured as f
 - **`types/`**: Contains TypeScript type definitions.
 - **`constants.ts`**: Contains constant values used throughout the frontend application.
 
-### 5.2. Backend (Server) Source Code
+### 6.2. Backend (Server) Source Code
 
 The `src` directory contains the core application logic, structured as follows:
 
@@ -149,6 +230,6 @@ The `src` directory contains the core application logic, structured as follows:
 - **`data/`**: Contains database interaction functions wrapping Prisma calls.
 - **`prisma/`**: Contains the `schema.prisma` file defining the database models.
 
-## 6. License -
+## 7. License -
 Copyright (c) 2026 H.V.L.Hasanka<br>
 Licensed under [MIT License](LICENSE)

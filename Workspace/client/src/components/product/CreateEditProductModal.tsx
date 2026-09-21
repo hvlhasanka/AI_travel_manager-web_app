@@ -1,7 +1,8 @@
 import { X, Sparkles, ArrowDown } from "lucide-react";
 import placeholderImage from "@/assets/images/polaroid-white-photo.jpg";
 import { useForm, Controller } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createProduct,
@@ -83,6 +84,7 @@ export default function CreateEditProductModal({
   const [isImageGenerating, setIsImageGenerating] = useState(false);
   const [isFullscreenImageOpen, setIsFullscreenImageOpen] = useState(false);
   const [lastAiGenerateQuery, setLastAiGenerateQuery] = useState("");
+  useBodyScrollLock(isOpen);
 
   const {
     register,
@@ -96,6 +98,23 @@ export default function CreateEditProductModal({
   } = useForm<CreateEditProductModalData>({
     defaultValues: getDefaultValues(product),
   });
+
+  const descriptionValue = watch("description");
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (descriptionRef.current) {
+      const el = descriptionRef.current;
+
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [descriptionValue, isOpen]);
+
+  const { ref: formDescriptionRef, ...descriptionRest } = register(
+    "description",
+    { required: true },
+  );
 
   const handleAiGenerateImage = async () => {
     const { productName, description, destination, category } = getValues();
@@ -248,7 +267,7 @@ export default function CreateEditProductModal({
   return (
     <>
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all duration-300 ease-out ${
+        className={`fixed inset-0 z-50 flex justify-center items-center py-[5vh] bg-slate-900/40 backdrop-blur-sm px-4 transition-all duration-300 ease-out ${
           isOpen
             ? "opacity-100 visible"
             : "opacity-0 invisible pointer-events-none"
@@ -341,9 +360,13 @@ export default function CreateEditProductModal({
                         Description <span className="text-red-500">*</span>
                       </label>
                       <textarea
-                        {...register("description", { required: true })}
+                        {...descriptionRest}
+                        ref={(e) => {
+                          formDescriptionRef(e);
+                          descriptionRef.current = e;
+                        }}
                         rows={3}
-                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 resize-none ${errors.description ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
+                        className={`w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 min-h-[90px] resize-none ${errors.description ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:ring-primary-500"}`}
                       />
                     </div>
                   </div>

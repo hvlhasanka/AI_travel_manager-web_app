@@ -1,5 +1,6 @@
 import { Sparkles, X, ArrowRight } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { useForm } from "react-hook-form";
 import DiscardConfirmModal from "@/components/product/DiscardConfirmModal";
 import PoweredByOpenAi from "@/components/product/PoweredByOpenAi";
@@ -39,6 +40,7 @@ export default function AiOverlay({
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [bannerMsg, setBannerMsg] = useState<string | null>(null);
   const [isShaking, setIsShaking] = useState(false);
+  useBodyScrollLock(isOpen);
 
   const {
     register,
@@ -93,6 +95,15 @@ export default function AiOverlay({
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      const el = inputRef.current;
+
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [aiQuery, isOpen]);
+
   const queryRef = (e: HTMLTextAreaElement | null) => {
     queryRegisterRef(e);
     inputRef.current = e;
@@ -118,7 +129,7 @@ export default function AiOverlay({
         />
       )}
       <div
-        className={`fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-all duration-300 ease-out ${
+        className={`fixed inset-0 z-[60] flex flex-col items-center pt-[15vh] sm:pt-[20vh] pb-8 bg-slate-900/40 backdrop-blur-sm px-4 overflow-y-auto transition-all duration-300 ease-out ${
           isOpen
             ? "opacity-100 visible"
             : "opacity-0 invisible pointer-events-none"
@@ -150,13 +161,13 @@ export default function AiOverlay({
             </h2>
           </div>
           <div
-            className={`w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-4 border transition-all ${
+            className={`w-full max-w-3xl bg-white rounded-[2rem] shadow-2xl p-3 sm:p-4 flex items-start gap-2 sm:gap-4 border transition-all ${
               errors.query
                 ? "border-red-500 ring-4 ring-red-500/20 animate-shake"
                 : "border-slate-100"
             } ${isShaking ? "animate-shake" : ""}`}
           >
-            <div className="bg-primary-100 p-2 sm:p-3 rounded-full flex-shrink-0">
+            <div className="bg-primary-100 p-2 sm:p-3 rounded-full flex-shrink-0 mt-1">
               <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-primary-500" />
             </div>
             <textarea
@@ -165,7 +176,7 @@ export default function AiOverlay({
               onBlur={queryOnBlur}
               {...queryRest}
               rows={2}
-              className="w-full text-2xl font-medium bg-transparent border-none focus:outline-none focus:ring-0 text-slate-800 resize-none py-2"
+              className={`w-full text-2xl font-medium bg-transparent border-none focus:outline-none focus:ring-0 text-slate-800 min-h-[72px] py-2 resize-none`}
             />
             {aiQuery && (
               <button
@@ -175,7 +186,7 @@ export default function AiOverlay({
                   e.stopPropagation();
                   setValue("query", "");
                 }}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0"
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors flex-shrink-0 mt-3"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -242,7 +253,12 @@ export default function AiOverlay({
           title={discardTitle}
           description={discardDescription}
         />
-
+      </div>
+      <div
+        className={`fixed inset-0 z-[70] pointer-events-none transition-all duration-300 ease-out ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+      >
         <PoweredByOpenAi />
       </div>
     </>

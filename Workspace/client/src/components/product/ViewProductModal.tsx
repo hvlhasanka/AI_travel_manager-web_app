@@ -1,5 +1,6 @@
 import { X, Pencil, Trash2, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import type { Product } from "@/types/product.types";
 import FullscreenImageOverlay from "@/components/FullscreenImageOverlay";
 import ExportLoadingOverlay from "@/components/ExportLoadingOverlay";
@@ -28,6 +29,7 @@ export default function ViewProductModal({
   const [localProduct, setLocalProduct] = useState<Product | null>(
     incomingProduct,
   );
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (incomingProduct) {
@@ -54,7 +56,7 @@ export default function ViewProductModal({
     <>
       <ExportLoadingOverlay isOpen={isExporting} />
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6 transition-all duration-300 ease-out ${
+        className={`fixed inset-0 z-50 flex justify-center items-center py-[5vh] bg-slate-900/40 backdrop-blur-sm px-4 sm:px-6 transition-all duration-300 ease-out ${
           isOpen
             ? "opacity-100 visible"
             : "opacity-0 invisible pointer-events-none"

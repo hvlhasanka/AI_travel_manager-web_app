@@ -305,7 +305,7 @@ export default function ProductsSection() {
         id="products-section"
         className="w-full flex-1 bg-white rounded-2xl min-[1090px]:rounded-[3rem] shadow-sm flex flex-col items-center py-6 px-4 min-[1090px]:py-16 min-[1090px]:px-16 min-[1600px]:px-[5%] text-center"
       >
-        <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 text-left">
+        <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2 text-left">
           <div className="flex flex-col gap-1">
             <h2 className="text-3xl font-bold text-slate-800">
               Travel Products
@@ -323,7 +323,7 @@ export default function ProductsSection() {
               </div>
             )}
 
-            {totalCount > 0 && (
+            {totalCount > 0 && (selectedCount > 0 || hasActiveFilters) && (
               <div className="relative" ref={exportDropdownRef}>
                 <button
                   onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
@@ -406,17 +406,7 @@ export default function ProductsSection() {
               )}
             </div>
             <button
-              onClick={() => {
-                const newState = !isFilterOpen;
-                setIsFilterOpen(newState);
-                if (newState) {
-                  setTimeout(() => {
-                    document
-                      .getElementById("product-filter-container")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }, 100);
-                }
-              }}
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={`flex-shrink-0 flex items-center justify-center w-10 h-10 border rounded-full transition-colors cursor-pointer ${
                 isFilterOpen
                   ? "bg-primary-100 text-primary-600 border-primary-200"
@@ -435,21 +425,31 @@ export default function ProductsSection() {
             </button>
           </div>
         </div>
-        <div className="w-full flex flex-col gap-6 h-full min-h-[400px]">
+        <div className="w-full flex flex-col gap-0 h-full min-h-[400px]">
           {/* Filter Inner Container */}
-          <ProductFilter
-            onFilter={onSubmit}
-            onReset={() => {
-              setFilters(null);
-              setLastAiQuery("");
-              setBanner({
-                type: "success",
-                message: "Filter reset successful",
-              });
-            }}
-            className={isFilterOpen ? "flex" : "hidden"}
-            externalFilters={filters}
-          />
+          <div
+            className={`grid transition-all duration-300 ease-in-out ${
+              isFilterOpen
+                ? "grid-rows-[1fr] opacity-100"
+                : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <ProductFilter
+                onFilter={onSubmit}
+                onReset={() => {
+                  setFilters(null);
+                  setLastAiQuery("");
+                  setBanner({
+                    type: "success",
+                    message: "Filter reset successful",
+                  });
+                }}
+                className="flex mb-6"
+                externalFilters={filters}
+              />
+            </div>
+          </div>
           {/* Products Table Inner Container */}
           <div
             className={`w-full min-h-[65vh] rounded-2xl min-[1090px]:rounded-3xl p-4 min-[1090px]:p-8 flex flex-col overflow-hidden transition-all duration-300 ease-in-out`}
