@@ -267,7 +267,7 @@ export default function CreateEditProductModal({
   return (
     <>
       <div
-        className={`fixed inset-0 z-50 flex justify-center items-start pt-[5vh] sm:pt-[10vh] pb-4 bg-slate-900/40 backdrop-blur-sm px-4 transition-all duration-300 ease-out ${
+        className={`fixed inset-0 z-50 flex justify-center items-center py-[5vh] bg-slate-900/40 backdrop-blur-sm px-4 transition-all duration-300 ease-out ${
           isOpen
             ? "opacity-100 visible"
             : "opacity-0 invisible pointer-events-none"
