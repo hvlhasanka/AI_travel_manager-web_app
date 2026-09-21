@@ -323,7 +323,7 @@ export default function ProductsSection() {
               </div>
             )}
 
-            {totalCount > 0 && (
+            {totalCount > 0 && (selectedCount > 0 || hasActiveFilters) && (
               <div className="relative" ref={exportDropdownRef}>
                 <button
                   onClick={() => setIsExportDropdownOpen(!isExportDropdownOpen)}
